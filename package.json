@@ -1,12 +1,14 @@
 {
   "name": "grocerease-be",
   "version": "1.0.0",
+  "type": "module",
   "description": "Back-End for GrocerEase Mobile App",
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "start-dev": "nodemon src/app.js"
   },
   "keywords": [
     "Back-End",
@@ -20,9 +22,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.4",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "sequelize-cli": "^6.6.2"
   },
   "devDependencies": {
     "eslint": "^9.15.0",
