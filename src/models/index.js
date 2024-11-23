@@ -1,7 +1,13 @@
-﻿import { user } from './model_instances.js';
+﻿import {
+  user,
+  list,
+  session,
+} from './instances.js';
 import initDatabaseMigration from './migrate.js';
 
 export {
-  user,
   initDatabaseMigration,
+  user,
+  list,
+  session,
 };

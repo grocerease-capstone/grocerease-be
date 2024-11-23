@@ -1,15 +1,17 @@
-import { sequelize } from '../config/index.js';
-//import './model_relations.js';
-//import './model_instances.js';
+import { sequelize } from './definitions.js';
+import './relations.js';
+
 
 const initDatabaseMigration = async () => {
   try {
-    await sequelize.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await sequelize.sync({ alter: true });
+    console.log('Running migrations...');
+    await sequelize.sync(); // Uncomment to create new table only
+    //await sequelize.sync({ alter: true }); // Uncomment to alter and create new table
+    console.log('Migrations completed successfully.');
   } catch (error) {
-    return error;
+    console.error('Migration failed:', error);
+    throw error;
   }
-  return true;
 };
 
 export default initDatabaseMigration;

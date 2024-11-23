@@ -21,7 +21,7 @@ app.use(express.json());
 // Setup routes later in the app
 const startServer = async () => {
   try {
-    await initDatabaseMigration(); // Run database migrations
+    initDatabaseMigration(); // Run database migrations
 
     appRoutes(app); // Apply routes
 

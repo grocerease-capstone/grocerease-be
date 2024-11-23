@@ -1,7 +1,8 @@
 import {
   User,
   List,
-} from './model_definitions.js';
+  Session,
+} from './definitions.js';
 
 User.hasMany(List);
 List.belongsTo(User, {
@@ -9,4 +10,24 @@ List.belongsTo(User, {
   onUpdate: 'CASCADE',
 });
 
-export { User, List };
+Session.belongsTo(User, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+export {
+  User,
+  List,
+  Session
+};
+
+/*
+Future Tables
+
+// User to List relationship
+User.hasMany(List);
+List.belongsTo(User, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+*/
