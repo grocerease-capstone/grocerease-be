@@ -10,10 +10,10 @@ const getSequelize = () => {
       host: process.env.DB_HOST || '127.0.0.1',
       dialect: 'mysql',
       port: process.env.DB_PORT || 3306,
-      /*
-      dialectOptions: {
-        socketPath: process.env.SOCKET_PATH + process.env.CONNECTION_NAME, // Optional for cloud-based MySQL
-      },*/
+
+      // dialectOptions: {
+      //   socketPath: process.env.SOCKET_PATH + process.env.CONNECTION_NAME, // Optional for cloud-based MySQL
+      // }, // Uncomment to connect via socket path/ Unix
       logging: console.log, // Enable logging for debugging
     }
   );
@@ -22,11 +22,8 @@ const getSequelize = () => {
 };
 
 export default getSequelize;
-// const serverConnection = `mysql://${process.env.DB_USER}:` +
 
-// export default sequelize;
-
-/*
+/* // Connect via Unix
 const connectionString = `mysql://${process.env.DB_USER}:` +
   `${process.env.DB_PASSWORD}@` +
   `${process.env.DB_HOST}/` +
