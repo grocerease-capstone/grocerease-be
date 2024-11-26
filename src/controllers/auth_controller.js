@@ -3,7 +3,7 @@ import { sequelize } from '../models/definitions.js';
 import { registerValidator, loginValidator } from '../validators/index.js';
 import { User, Session } from '../models/index.js';
 import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
-import { createToken, verifyToken } from '../middlewares/jwt.js';
+import { createToken } from '../middlewares/jwt.js';
 import Response from '../dto/response.js';
 
 const registerHandler = async (req, res) => {
