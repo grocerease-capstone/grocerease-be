@@ -1,12 +1,4 @@
 ﻿/* eslint-disable no-undef */
-/*import { storage } from '@google-cloud/storage';
-
-const storage = new Storage({
-  projectID: process.env.GC_PROJECT_ID,
-  keyFilename: process.env.GC_STORAGE_BUCKET,
-});
-
-export */
 import { Storage } from '@google-cloud/storage';
 
 const storage = new Storage({
