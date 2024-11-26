@@ -1,18 +1,24 @@
-﻿//import userRoute from './user_route.js';  // Import separate user routes
-// import { user } from '../models/index.js'
-
+﻿import authRoutes from './auth_routes.js';
+import { verifyToken } from '../middlewares/jwt.js';
 
 const appRoutes = (app) => {
-  //app.use('/', userRoute);  // Use user route for /users endpoint
 
   app.get('/', (req, res) => {
-    res.send('Hello, World!'); // Ensure response is always sent
-    console.log('test');
+    res.send('Back-End is up and running!');
   });
 
-  app.use((req, res) => {
-    res.status(404).json({ error: 'Not Found' });
+  app.post('/test', (req, res) => {
+    res.json({ receivedBody: req.body });
   });
+
+  app.get('/test-auth', verifyToken, (req, res) => {
+    res.json({
+      message: 'This is a protected route!',
+      user: res.locals.decodedToken,
+    });
+  });
+
+  app.use('/auth', authRoutes);
 
   return app;
 };
