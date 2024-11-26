@@ -1,4 +1,4 @@
-﻿/* eslint-disable no-undef */
+/* eslint-disable no-undef */
 import { Sequelize } from 'sequelize';
 
 const getSequelize = () => {
