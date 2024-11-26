@@ -1,27 +1,15 @@
 ﻿/* eslint-disable no-undef */
-/*import express from 'express';
-
-const app = express();
-app.use(express.json());
-
-
-const startServer = (appRoutes) => {
-  appRoutes.listen(process.env.PORT);
-};
-
-export { app, startServer };*/
-
 import express from 'express';
 import { initDatabaseMigration } from '../models/index.js';
 import appRoutes from '../routes/index.js';
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Setup routes later in the app
 const startServer = async () => {
   try {
-    initDatabaseMigration(); // Run database migrations
+    // await initDatabaseMigration(); // Run database migrations
 
     appRoutes(app); // Apply routes
 

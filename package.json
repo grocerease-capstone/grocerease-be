@@ -18,15 +18,19 @@
   "author": "Ibrahim Nur Huda, Eilinafta Gita",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.4.0",
     "@google-cloud/storage": "^7.14.0",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.4",
     "sequelize": "^6.37.5",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "eslint": "^9.15.0",

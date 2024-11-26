@@ -7,35 +7,15 @@ const storage = new Storage({
 });
 
 export */
-import mysql from 'mysql2/promise';
+import { Storage } from '@google-cloud/storage';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+const storage = new Storage({
+  projectId: process.env.GC_PROJECT_ID,
+  keyFilename: process.env.GC_KEY_FILE,
 });
 
-/**
- * Upload file contents to the local database
- * @param {string} tableName - The name of the table to store the file.
- * @param {string} fileName - The name of the file (used as a reference or identifier).
- * @param {Buffer|string} contents - The file contents as a Buffer or string.
- */
-const uploadFileToDatabase = async (tableName, fileName, contents) => {
-  const connection = await pool.getConnection();
-  try {
-    const query = `
-      INSERT INTO ?? (file_name, file_contents) 
-      VALUES (?, ?)
-    `;
-    await connection.query(query, [tableName, fileName, contents]);
-  } catch (error) {
-    console.error('Error uploading file to database:', error);
-    throw error;
-  } finally {
-    connection.release();
-  }
+const uploadFileToStorage = async (bucketName, fileName, contents) => {
+  await storage.bucket(bucketName).file(fileName).save(contents);
 };
 
-export default uploadFileToDatabase;
+export default uploadFileToStorage;

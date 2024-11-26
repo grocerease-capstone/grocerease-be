@@ -1,13 +1,13 @@
 ﻿import {
-  user,
-  list,
-  session,
-} from './instances.js';
+  User,
+  List,
+  Session,
+} from './relations.js';
 import initDatabaseMigration from './migrate.js';
 
 export {
   initDatabaseMigration,
-  user,
-  list,
-  session,
+  User,
+  List,
+  Session,
 };
