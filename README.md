@@ -1,4 +1,4 @@
-# grocerease-be-test
+# GrocerEase Back-End Setup
 
 ### How to Install
 1. Clone this repo, `cd` to the cloned repo and checkout to `dev`
@@ -22,4 +22,40 @@
     SOCKET_PATH=
     CONNECTION_NAME=
     ```
+4. Setup Migration
+
+    Checkout src/models/migrate.js
+
+    Make sure to uncomment one of these **two**:
+    ```
+    try {
+      console.log('Running migrations...');
+      // await sequelize.sync(); // Uncomment to create new table only
+      // await sequelize.sync({ alter: true }); // Uncomment to alter and/or create new table
+      console.log('Migrations completed successfully.');
+    } 
+    ```
+    Checkout src/config/server.js
+
+    Make sure to uncomment **initDatabaseMigration()**:
+
+    ```
+    try {
+      // await initDatabaseMigration(); // Run database migrations
+
+      appRoutes(app); // Apply routes
+      ...
+    }
+    ```
+5. Run the server
+    
+    Run with node
+    ```bash
+    npm run start
+    ```
+    Run with nodemon
+    ```bash
+    npm run start-dev
+    ```
+    Make sure to comment **initDatabaseMigration()** after first migration if you want to run with nodemon.
 
