@@ -23,7 +23,7 @@ class Response {
     const res = {
       status: false,
       code: 400,
-      message: 'Bad Request',
+      message: 'Bad request',
       data,
     };
     return res;
@@ -33,7 +33,7 @@ class Response {
     const res = {
       status: false,
       code: 401,
-      message: 'Unauthorized Access',
+      message: 'Unauthorized access',
       data,
     };
     return res;
@@ -43,7 +43,7 @@ class Response {
     const res = {
       status: false,
       code: 403,
-      message: 'Forbidden Access',
+      message: 'Forbidden access',
       data,
     };
     return res;
@@ -53,7 +53,7 @@ class Response {
     const res = {
       status: false,
       code: 404,
-      message: 'Request Not Found',
+      message: 'Request not found',
       data,
     };
     return res;
@@ -63,7 +63,7 @@ class Response {
     const res = {
       status: false,
       code: 409,
-      message: 'Resource Already Exist',
+      message: 'Resource already exist',
       data,
     };
     return res;
@@ -83,7 +83,7 @@ class Response {
     const res = {
       status: false,
       code: 500,
-      message: 'Request Failed. Internal Server Error',
+      message: 'Request failed. Internal Server Error',
       data,
     };
     return res;

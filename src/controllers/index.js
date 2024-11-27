@@ -1,5 +1,5 @@
-﻿import { registerHandler, loginHandler } from './auth_controller.js';
+﻿import { registerHandler, loginHandler, logoutHandler } from './auth_controller.js';
 
 export {
-  registerHandler, loginHandler,
+  registerHandler, loginHandler, logoutHandler,
 };
