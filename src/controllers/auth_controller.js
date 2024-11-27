@@ -3,13 +3,14 @@ import { sequelize } from '../models/definitions.js';
 import { registerValidator, loginValidator } from '../validators/index.js';
 import { User, Session } from '../models/index.js';
 import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
-import { createToken, verifyToken } from '../middlewares/jwt.js';
+import { createToken } from '../middlewares/jwt.js';
 import Response from '../dto/response.js';
 
+let response;
+
 const registerHandler = async (req, res) => {
-  let response;
   const reqBody = req.body;
-  console.log('Request Body:', req.body);
+  // console.log('Request Body:', req.body);
 
   const reqError = registerValidator(reqBody);
   if (reqError.length !== 0) {
@@ -22,7 +23,6 @@ const registerHandler = async (req, res) => {
     response = Response.defaultConflict({ errors: reqError });
     return res.status(response.code).json(response);
   }
-
 
   const userId = uuidv4();
   const password = await encrypt(reqBody.password);
@@ -48,7 +48,6 @@ const registerHandler = async (req, res) => {
 
 const loginHandler = async (req, res) => {
   const reqBody = req.body;
-  let response;
 
   const reqError = loginValidator(reqBody);
   if (reqError.length !== 0) {
@@ -93,7 +92,32 @@ const loginHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
+const logoutHandler = async (req, res) => {
+  const token = req.get('Authorization')?.split(' ')?.[1];
+
+  if (!token) {
+    response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const result = await Session.destroy({
+    where: { token },
+  }).catch(() => {
+    response = Response.defaultInternalError(null);
+    return res.status(response.code).json(response);
+  });
+
+  if (result === 0) {
+    response = Response.defaultNotFound(null);
+    return res.status(response.code).json(response);
+  }
+
+  response = Response.defaultOK({ message: 'Logout successful.' });
+  return res.status(response.code).json(response);
+};
+
 export {
   registerHandler,
   loginHandler,
+  logoutHandler,
 };
