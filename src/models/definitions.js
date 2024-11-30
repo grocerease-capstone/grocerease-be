@@ -2,7 +2,10 @@ import getSequelize from '../config/orm.js';
 import {
   user,
   list,
-  session
+  session,
+  item,
+  userList,
+  productItem,
 } from './instances.js';
 
 const sequelize = getSequelize();
@@ -25,10 +28,31 @@ const Session = sequelize.define(
   session.options,
 );
 
+const Item = sequelize.define(
+  item.name,
+  item.attributes,
+  item.options,
+);
+
+const UserList = sequelize.define(
+  userList.name,
+  userList.attributes,
+  userList.options,
+);
+
+const ProductItem = sequelize.define(
+  productItem.name,
+  productItem.attributes,
+  productItem.options,
+);
+
 export {
   User,
   List,
   Session,
+  Item,
+  UserList,
+  ProductItem,
   sequelize,
 };
 
@@ -39,6 +63,4 @@ const Model_Name = sequelize.define(
   ins_name.attributes,
   ins_name.options,
 );
-
-
 */

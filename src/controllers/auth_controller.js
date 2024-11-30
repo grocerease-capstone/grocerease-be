@@ -88,7 +88,7 @@ const loginHandler = async (req, res) => {
   await sequelize.transaction(sessionTransaction);
 
   res.setHeader('Authorization', jwt);
-  response = Response.defaultOK('Login Successful', null); // Kalau mau tampilin JWT di Body, ganti "null" ke "jwt" tanpa quote
+  response = Response.defaultOK('Login Successful', jwt); // Kalau mau tampilin JWT di Body, ganti "null" ke "jwt" tanpa quote
   return res.status(response.code).json(response);
 };
 

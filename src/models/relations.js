@@ -2,10 +2,13 @@ import {
   User,
   List,
   Session,
+  UserList,
+  ProductItem,
 } from './definitions.js';
 
 User.hasMany(List);
 List.belongsTo(User, {
+  foreignKey: 'UserId',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
 });
@@ -15,10 +18,22 @@ Session.belongsTo(User, {
   onUpdate: 'CASCADE',
 });
 
+User.belongsToMany(List, { through: UserList });
+List.belongsToMany(User, { through: UserList });
+
+List.hasMany(ProductItem);
+ProductItem.belongsTo(List, {
+  foreignKey: 'ListId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
 export {
   User,
   List,
-  Session
+  Session,
+  UserList,
+  ProductItem,
 };
 
 /*
@@ -31,3 +46,5 @@ List.belongsTo(User, {
   onUpdate: 'CASCADE',
 });
 */
+// UserList.hasMany(User);
+// UserList.hasMany(List);
