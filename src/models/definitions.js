@@ -1,4 +1,4 @@
-import getSequelize from '../config/orm.js';
+import { sequelize } from '../config/index.js';
 import {
   user,
   list,
@@ -7,8 +7,6 @@ import {
   userList,
   productItem,
 } from './instances.js';
-
-const sequelize = getSequelize();
 
 const User = sequelize.define(
   user.name,

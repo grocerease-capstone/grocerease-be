@@ -1,4 +1,4 @@
-import { sequelize } from './definitions.js';
+import { sequelize } from '../config/index.js';
 import './relations.js';
 
 const initDatabaseMigration = async () => {
@@ -8,9 +8,10 @@ const initDatabaseMigration = async () => {
     // await sequelize.sync({ alter: true }); // Uncomment to alter and create new table
     console.log('Migrations completed successfully.');
   } catch (error) {
-    console.error('Migration failed:', error);
-    throw error;
+    console.error('Migration failed: ', error);
+    return error;
   }
+  return true;
 };
 
 export default initDatabaseMigration;
