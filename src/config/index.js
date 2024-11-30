@@ -7,5 +7,4 @@ export {
   startServer,
   sequelize,
   uploadFileToDatabase,
-  
 };
