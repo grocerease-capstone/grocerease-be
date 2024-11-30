@@ -63,6 +63,4 @@ const Model_Name = sequelize.define(
   ins_name.attributes,
   ins_name.options,
 );
-
-
 */

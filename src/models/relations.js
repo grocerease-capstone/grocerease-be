@@ -21,6 +21,7 @@ Session.belongsTo(User, {
 User.belongsToMany(List, { through: UserList });
 List.belongsToMany(User, { through: UserList });
 
+List.hasMany(ProductItem);
 ProductItem.belongsTo(List, {
   foreignKey: 'ListId',
   onDelete: 'CASCADE',

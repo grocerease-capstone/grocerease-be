@@ -50,8 +50,8 @@ const list = {
   name: 'List',
   attributes: {
     id: {
-      type: DataTypes.UUID,
-      allowNull: false,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
     title: {
@@ -77,8 +77,8 @@ const productItem = {
   name: 'Product_Item',
   attributes: {
     id: {
-      type: DataTypes.UUID,
-      allowNull: false,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
     name: {
@@ -113,7 +113,6 @@ const item = {
   attributes: {
     id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },

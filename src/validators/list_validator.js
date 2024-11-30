@@ -2,9 +2,8 @@ import Joi from 'joi';
 import getError from './error_check.js';
 
 const listValidator = (body) => {
-  if (typeof body.productItems === 'string') {
-    body.productItems = JSON.parse(body.productItems);
-    console.log('This is product', body.productItems);
+  if (typeof body.product_items === 'string') {
+    body.product_items = JSON.parse(body.product_items);
   }
 
   const productItemsArray = Joi.object({
@@ -30,7 +29,7 @@ const listValidator = (body) => {
       .empty(),
     thumbnail_image: Joi.string()
       .empty(),
-    productItems: Joi.array()
+    product_items: Joi.array()
       .items(productItemsArray)
       .min(1)
       .required(),
