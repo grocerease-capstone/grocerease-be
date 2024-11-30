@@ -1,11 +1,10 @@
 /* eslint-disable camelcase */
-import { v4 as uuidv4 } from 'uuid';
-import { sequelize } from '../models/definitions.js';
-import { User, List, ProductItem } from '../models/index.js';
-import Response from '../dto/response.js';
-import { convertFileName } from '../utils/file_process.js';
-import uploadFileToStorage from '../config/storage.js';
-import { listValidator } from '../validators/index.js';
+import { v4 as uuidv4 } from "uuid";
+import Response from "../dto/response.js";
+import { List, ProductItem, sequelize } from "../models/definitions.js";
+import { User } from "../models/index.js";
+import { convertFileName } from "../utils/file_process.js";
+import { listValidator } from "../validators/index.js";
 
 let response;
 
