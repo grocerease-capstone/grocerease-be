@@ -23,7 +23,7 @@ const createListHandler = async (req, res) => {
 
   let thumbnailImageName;
   if (reqFiles.thumbnail_image && typeof reqFiles.thumbnail_image === "object") {
-    thumbnailImageName = convertFileName("thumbnails/", reqFiles.thumbnail_image[0].originalname);
+    thumbnailImageName = convertFileName("thumbnail_images/", reqFiles.thumbnail_image[0].originalname);
   }
 
   const { decodedToken } = res.locals;
