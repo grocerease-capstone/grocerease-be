@@ -1,7 +1,6 @@
 ﻿/* eslint-disable no-undef */
-import express from 'express';
-import { initDatabaseMigration } from '../models/index.js';
-import appRoutes from '../routes/index.js';
+import express from "express";
+import appRoutes from "../routes/index.js";
 
 const app = express();
 app.use(express.json());
@@ -18,7 +17,10 @@ const startServer = async () => {
       console.log(`Server is running on http://localhost:${port}`);
     });
   } catch (error) {
-    console.error('Error initializing database migration or starting server:', error);
+    console.error(
+      "Error initializing database migration or starting server:",
+      error
+    );
   }
 };
 
