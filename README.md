@@ -58,4 +58,19 @@
     npm run start-dev
     ```
     Make sure to comment **initDatabaseMigration()** after first migration if you want to run with nodemon.
+6. Prep Local Storage For Image Upload
 
+    Create new directory in grocerease-be
+    ```
+    grocerease-be/
+    ├── image_upload/
+    │   ├── receipt_images/
+    │   └── thumbnail_images/
+    ├── src/
+    │   ├── config/
+    │   ├── controllers/  
+    │   └── ...
+    ├── package.json
+    └── README.md
+    ```
+    These directories are used to store images.
