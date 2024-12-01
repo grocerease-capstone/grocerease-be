@@ -1,10 +1,11 @@
 /* eslint-disable camelcase */
-import { v4 as uuidv4 } from "uuid";
-import Response from "../dto/response.js";
-import { List, ProductItem, sequelize } from "../models/definitions.js";
-import { User } from "../models/index.js";
-import { convertFileName } from "../utils/file_process.js";
-import { listValidator } from "../validators/index.js";
+import { v4 as uuidv4 } from 'uuid';
+import { sequelize } from '../models/definitions.js';
+import { User, List, ProductItem } from '../models/index.js';
+import { convertFileName } from '../utils/file_process.js';
+import { listValidator } from '../validators/index.js';
+import Response from '../dto/response.js';
+import uploadFileToStorage from '../config/storage.js';
 
 let response;
 
@@ -19,11 +20,11 @@ const createListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const receiptImageName = convertFileName("receipt_images/", reqFiles.receipt_image[0].originalname);
+  const receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
 
   let thumbnailImageName;
-  if (reqFiles.thumbnail_image && typeof reqFiles.thumbnail_image === "object") {
-    thumbnailImageName = convertFileName("thumbnail_images/", reqFiles.thumbnail_image[0].originalname);
+  if (reqFiles.thumbnail_image && typeof reqFiles.thumbnail_image === 'object') {
+    thumbnailImageName = convertFileName('thumbnail_images/', reqFiles.thumbnail_image[0].originalname);
   }
 
   const { decodedToken } = res.locals;
@@ -68,13 +69,43 @@ const createListHandler = async (req, res) => {
   // }
 
   // Local Upload
-  await uploadFileToStorage("../../image_upload", receiptImageName, reqFiles.receipt_image[0].buffer);
+  await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
   if (thumbnailImageName) {
-    await uploadFileToStorage("../../image_upload", thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   }
 
-  response = Response.defaultOK("New list added successfully", null);
+  response = Response.defaultOK('New list added successfully', null);
   return res.status(response.code).json(response);
 };
 
-export { createListHandler };
+const getListHandler = async (req, res) => {
+  const { listId } = req.params;
+  const { decodedToken } = res.locals;
+
+  if (listId <= 0) {
+    response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const userList = await User.findOne({
+    where: {
+      userId: decodedToken.id,
+    },
+    include: {
+      model: List,
+      attributes: ['id', 'title', 'thumbnailImage'],
+    },
+  }).then((user) => user.list).catch((e) => {
+    const error = new Error(e);
+    return error;
+  });
+
+  if (userList instanceof Error) {
+    response = Response.defaultInternalError({ error: userList });
+    return res.status(response.code).json(response);
+  }
+};
+
+export {
+  createListHandler,
+  getListHandler };
