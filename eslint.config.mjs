@@ -10,6 +10,7 @@ export default [
   {
     rules: {
       'linebreak-style': ['off'],
+      'camelcase' : ['off'],
     },
   },
 ];

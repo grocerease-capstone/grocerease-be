@@ -58,12 +58,20 @@ const list = {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    receiptImage: {
+    type: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    receiptImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     thumbnailImage: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    totalExpenses : {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
   },

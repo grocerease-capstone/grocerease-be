@@ -10,25 +10,29 @@ const listValidator = (body) => {
     name: Joi.string()
       .min(1)
       .required(),
-    amount: Joi.number()
-      .integer()
-      .min(1),
-    price: Joi.number()
-      .min(0),
-    category: Joi.string()
-      .min(1),
-    total_price: Joi.number()
-      .min(0)
+    amount: Joi.number().integer(),
+    price: Joi.number(),
+    category: Joi.string(),
+    total_price: Joi.number(),
   });
 
   const list = Joi.object({
     title: Joi.string()
       .min(1)
       .required(),
+    type: Joi.string()
+      .valid('Track', 'Plan')
+      .required(),
     receipt_image: Joi.string()
-      .empty(),
+      .allow(null)
+      .empty('')
+      .optional(),
     thumbnail_image: Joi.string()
-      .empty(),
+      .allow(null)
+      .empty('')
+      .optional(),
+    total_expenses: Joi.number()
+      .empty(''),
     product_items: Joi.array()
       .items(productItemsArray)
       .min(1)
@@ -40,3 +44,16 @@ const listValidator = (body) => {
 };
 
 export default listValidator;
+
+// name: Joi.string()
+//   .min(1)
+//   .required(),
+// amount: Joi.number()
+//   .integer()
+//   .min(1),
+// price: Joi.number()
+//   .min(0),
+// category: Joi.string()
+//   .min(1),
+// total_price: Joi.number()
+//   .min(0)
