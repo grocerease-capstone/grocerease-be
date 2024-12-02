@@ -1,18 +1,21 @@
 /* eslint-disable camelcase */
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { sequelize } from '../models/definitions.js';
 import { User, List, ProductItem } from '../models/index.js';
 import { convertFileName } from '../utils/file_process.js';
 import { listValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
+import { allLists } from '../dto/request.js';
 
 let response;
 
+// POST List (Track or Plan)
 const createListHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
   const reqProductItems = reqBody.product_items;
+  let thumbnailImageName, receiptImageName;
 
   const reqError = listValidator(reqBody);
   if (reqError.length !== 0) {
@@ -20,9 +23,11 @@ const createListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
+  if (reqFiles.receipt_image && typeof reqFiles.receipt_image === 'object') {
+    receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
+    // thumbnailImageName = receiptImageName;
+  }
 
-  let thumbnailImageName;
   if (reqFiles.thumbnail_image && typeof reqFiles.thumbnail_image === 'object') {
     thumbnailImageName = convertFileName('thumbnail_images/', reqFiles.thumbnail_image[0].originalname);
   }
@@ -39,8 +44,10 @@ const createListHandler = async (req, res) => {
     );
     const createList = await List.create({
       title: reqBody.title,
-      receiptImage: receiptImageName,
-      thumbnailImage: thumbnailImageName,
+      type: reqBody.type,
+      receiptImage: receiptImageName === null ? null : receiptImageName,
+      thumbnailImage: thumbnailImageName === null ? null : thumbnailImageName,
+      totalExpenses: reqBody.total_expenses === '' ? 0 : reqBody.total_expenses,
       UserId: user.id,
     }, { transaction: t });
 
@@ -69,7 +76,10 @@ const createListHandler = async (req, res) => {
   // }
 
   // Local Upload
-  await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+  if (receiptImageName) {
+    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+  }
+
   if (thumbnailImageName) {
     await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   }
@@ -78,34 +88,70 @@ const createListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
-const getListHandler = async (req, res) => {
-  const { listId } = req.params;
+
+// GET All List (Track or Plan)
+const getAllListHandler = async (req, res) => {
+  const { type } = req.query;
   const { decodedToken } = res.locals;
 
-  if (listId <= 0) {
-    response = Response.defaultBadRequest(null);
+  if (type === null) {
+    response = Response.defaultBadRequest({ message: 'List type is missing.' });
     return res.status(response.code).json(response);
   }
 
-  const userList = await User.findOne({
-    where: {
-      userId: decodedToken.id,
-    },
-    include: {
-      model: List,
-      attributes: ['id', 'title', 'thumbnailImage'],
-    },
-  }).then((user) => user.list).catch((e) => {
-    const error = new Error(e);
-    return error;
+  let trackLists;
+
+  if (type === 'Track') {
+    trackLists = await List.findAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses'],
+    });
+  } else if (type === 'Plan') {
+    trackLists = await List.findAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type'],
+    });
+  }
+
+  if (!trackLists || trackLists.length === 0) {
+    response = Response.defaultNotFound('No lists found for this user');
+    return res.status(response.code).json(response);
+  }
+
+  const lists = trackLists.map((list) => {
+    const listDTO = allLists();
+    const imagePrefix = '../../image_upload/';
+    listDTO.id = list.id;
+    listDTO.title = list.title;
+    listDTO.type = list.type;
+    listDTO.total_expenses = list.totalExpenses;
+    if (!list.thumbnailImage && !list.receiptImage) {
+      listDTO.image = `${imagePrefix}default_images/`;
+    } else {
+      listDTO.image = list.thumbnailImage
+        ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+        : `${imagePrefix}receipt_images/${list.receiptImage}`;
+
+      // Cloud Fetching
+      // listDTO.image = list.thumbnailImage !== null
+      //   ? `${imagePrefix}${process.env.GC_STORAGE_BUCKET}/${list.thumbnailImage}`
+      //   : `${imagePrefix}${process.env.GC_STORAGE_BUCKET}/${list.receiptImage}`;
+    }
+
+    return listDTO;
   });
 
-  if (userList instanceof Error) {
-    response = Response.defaultInternalError({ error: userList });
-    return res.status(response.code).json(response);
-  }
+  response = Response.defaultOK('List obtained successfully.', { lists });
+  return res.status(response.code).json(response);
 };
 
 export {
   createListHandler,
-  getListHandler };
+  getAllListHandler,
+};
