@@ -6,9 +6,10 @@ import { convertFileName } from '../utils/file_process.js';
 import { listValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
-import { allLists, singleList } from '../dto/request.js';
+// import { allLists, singleList } from '../dto/request.js';
 
 let response;
+const imagePrefix = '../../image_upload/';
 
 // POST List (Track or Plan)
 const createListHandler = async (req, res) => {
@@ -52,21 +53,21 @@ const createListHandler = async (req, res) => {
       UserId: user.id,
     }, { transaction: t });
 
-    const createProductList = JSON.parse(reqProductItems).map((item) => ({
+    const createProductList = JSON.parse(reqProductItems).map((product) => ({
       ListId: createList.id,
-      name: item.name,
-      amount: item.amount,
-      price: item.price,
-      totalPrice: item.total_price,
-      category: item.category,
+      name: product.name,
+      amount: product.amount,
+      price: product.price,
+      totalPrice: product.total_price,
+      category: product.category,
     }));
     await ProductItem.bulkCreate(createProductList, { transaction: t });
   };
 
   try {
     await sequelize.transaction(createListTransaction);
-  } catch (error) {
-    response = Response.defaultInternalError({ error });
+  } catch (e) {
+    response = Response.defaultInternalError({ e });
     return res.status(response.code).json(response);
   }
 
@@ -85,7 +86,7 @@ const createListHandler = async (req, res) => {
     await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   }
 
-  response = Response.defaultOK('New list added successfully', null);
+  response = Response.defaultOK('New list added successfully.', null);
   return res.status(response.code).json(response);
 };
 
@@ -133,8 +134,7 @@ const getAllListHandler = async (req, res) => {
         },
       });
 
-      const listDTO = allLists();
-      const imagePrefix = '../../image_upload/';
+      const listDTO = {};
       listDTO.id = list.id;
       listDTO.title = list.title;
       listDTO.type = list.type;
@@ -160,7 +160,6 @@ const getAllListHandler = async (req, res) => {
 
 const getListById = async (req, res) => {
   const { listId } = req.params;
-  const imagePrefix = '../../image_upload/';
   
   if (listId <= 0) {
     const response = Response.defaultBadRequest(null);
@@ -208,8 +207,104 @@ const getListById = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
+const updateListHandler = async (req, res) => {
+  const { listId } = req.params;
+  const reqBody = req.body;
+  const reqFiles = req.files;
+
+  console.log(reqBody);
+
+  const reqError = listValidator(reqBody);
+  if (reqError.length !== 0) {
+    response = Response.defaultBadRequest({ errors: reqError });
+    return res.status(response.code).json(response);
+  }
+
+  if (listId <= 0) {
+    const response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const currentList = await List.findOne({
+    where: { id: listId },
+    attributes: ['id', 'title', 'receiptImage', 'thumbnailImage'],
+    include: {
+      model: ProductItem,
+      attributes: ['id', 'name', 'amount', 'price', 'totalPrice', 'category'],
+    },
+  }).catch((e) => {
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
+  });
+
+  if (currentList instanceof Error) {
+    response = Response.defaultNotFound(null);
+    return res.status(response.code).json(response);
+  }
+
+  const currentProduct = currentList.Product_Items;
+  const reqProductItems = reqBody.product_items;
+
+  currentProduct.map(async (product) => {
+    const updatedProduct = reqProductItems.find((p) => p.id === product.id);
+
+    product.name = updatedProduct.name;
+    product.amount = updatedProduct.amount;
+    product.price = updatedProduct.price;
+    product.totalPrice = updatedProduct.totalPrice;
+    product.category = updatedProduct.category;
+
+    try {
+      await product.save();
+    } catch (e) {
+      const error = new Error(e);
+      return error;
+    }
+  });
+  
+  currentList.id = listId;
+  currentList.title = reqBody.title;
+
+  if (reqBody.receiptImage && reqFiles.receipt_image) {
+    const receiptImageName = reqBody.receiptImage;
+    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+    currentList.receiptImage = receiptImageName;
+  }
+
+  if (reqBody.thumbnailImage && reqFiles.thumbnail_image) {
+    const thumbnailImageName = reqBody.thumbnailImage;
+    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    currentList.thumbnailImage = thumbnailImageName;
+  }
+
+  await currentList.save();
+
+  response = Response.defaultOK('New list added successfully.');
+  return res.status(response.code).json(response);
+};
+
+const deleteListHandler = async (req, res) => {
+  const { listId } = req.params;
+
+  console.log(req.params);
+
+  await List.destroy({
+    where: {
+      id: listId,
+    },
+  }).catch((e) => {
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
+  });
+
+  response = Response.defaultOK('List deleted successfully.', null);
+  return res.status(response.code).json(response);
+};
+
 export {
   createListHandler,
   getAllListHandler,
   getListById,
+  updateListHandler,
+  deleteListHandler,
 };
