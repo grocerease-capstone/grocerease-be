@@ -7,6 +7,9 @@ const listValidator = (body) => {
   }
 
   const productItemsArray = Joi.object({
+    id: Joi.number()
+      .min(1)
+      .required(),
     name: Joi.string()
       .min(1)
       .required(),
@@ -33,6 +36,8 @@ const listValidator = (body) => {
       .optional(),
     total_expenses: Joi.number()
       .empty(''),
+    total_items: Joi.number()
+      .min(1),
     product_items: Joi.array()
       .items(productItemsArray)
       .min(1)
