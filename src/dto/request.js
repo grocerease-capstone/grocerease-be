@@ -4,6 +4,7 @@ const allLists = () => {
     title: '',
     total_expenses: '',
     image: '',
+    total_products: 0,
   };
 
   return trackList;

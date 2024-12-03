@@ -124,28 +124,33 @@ const getAllListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const lists = trackLists.map((list) => {
-    const listDTO = allLists();
-    const imagePrefix = '../../image_upload/';
-    listDTO.id = list.id;
-    listDTO.title = list.title;
-    listDTO.type = list.type;
-    listDTO.total_expenses = list.totalExpenses;
-    if (!list.thumbnailImage && !list.receiptImage) {
-      listDTO.image = `${imagePrefix}default_images/`;
-    } else {
-      listDTO.image = list.thumbnailImage
-        ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-        : `${imagePrefix}receipt_images/${list.receiptImage}`;
+  const lists = await Promise.all(
+    trackLists.map(async (list) => {
+      const { count } = await ProductItem.findAndCountAll({
+        where: {
+          ListId: list.id,
+        },
+      });
 
-      // Cloud Fetching
-      // listDTO.image = list.thumbnailImage !== null
-      //   ? `${imagePrefix}${process.env.GC_STORAGE_BUCKET}/${list.thumbnailImage}`
-      //   : `${imagePrefix}${process.env.GC_STORAGE_BUCKET}/${list.receiptImage}`;
-    }
+      const listDTO = allLists(); // Initialize DTO
+      const imagePrefix = '../../image_upload/';
+      listDTO.id = list.id;
+      listDTO.title = list.title;
+      listDTO.type = list.type;
+      listDTO.total_expenses = list.totalExpenses || null;
+      listDTO.total_products = count;
 
-    return listDTO;
-  });
+      if (!list.thumbnailImage && !list.receiptImage) {
+        listDTO.image = `${imagePrefix}default_images/default_image.png`;
+      } else {
+        listDTO.image = list.thumbnailImage
+          ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+          : `${imagePrefix}receipt_images/${list.receiptImage}`;
+      }
+
+      return listDTO;
+    })
+  );
 
   response = Response.defaultOK('List obtained successfully.', { lists });
   return res.status(response.code).json(response);
