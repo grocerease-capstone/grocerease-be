@@ -1,5 +1,5 @@
 const allLists = () => {
-  const listData = {
+  const data = {
     id: 0,
     title: '',
     total_expenses: '',
@@ -8,9 +8,24 @@ const allLists = () => {
     total_items: 0,
   };
 
-  return listData;
+  return data;
+};
+
+const singleList = () => {
+  const data = {
+    id: 0,
+    name: '',
+    amount: 0,
+    price: 0,
+    total_price: 0,
+    category: '',
+    image: '',
+  };
+
+  return data;
 };
 
 export {
   allLists,
+  singleList,
 };

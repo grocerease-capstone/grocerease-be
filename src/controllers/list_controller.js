@@ -6,7 +6,7 @@ import { convertFileName } from '../utils/file_process.js';
 import { listValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
-import { allLists } from '../dto/request.js';
+import { allLists, singleList } from '../dto/request.js';
 
 let response;
 
@@ -133,7 +133,7 @@ const getAllListHandler = async (req, res) => {
         },
       });
 
-      const listDTO = allLists(); // Initialize DTO
+      const listDTO = allLists();
       const imagePrefix = '../../image_upload/';
       listDTO.id = list.id;
       listDTO.title = list.title;
@@ -158,7 +158,58 @@ const getAllListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
+const getListById = async (req, res) => {
+  const { listId } = req.params;
+  const imagePrefix = '../../image_upload/';
+  
+  if (listId <= 0) {
+    const response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const detailList = await List.findOne({
+    where: { id: listId },
+    attributes: ['title', 'receiptImage', 'thumbnailImage'],
+    include: {
+      model: ProductItem,
+      attributes: ['id', 'name', 'amount', 'price', 'totalPrice', 'category'],
+    },
+  }).catch((e) => {
+    console.error('Error fetching list details:', e);
+    const error = new Error(e);
+    throw error;
+  });
+
+  if (!detailList) {
+    const response = Response.defaultNotFound('List not found.');
+    return res.status(response.code).json(response);
+  }
+
+  const receipt_image = !detailList.receiptImage
+    ? `${imagePrefix}default_images/default_image.png`
+    : `${imagePrefix}${detailList.receiptImage}`;
+
+  const thumbnail_image = !detailList.thumbnailImage
+    ? receipt_image
+    : `${imagePrefix}${detailList.thumbnailImage}`;
+
+  const detailItems = detailList.Product_Items.map((detail) => ({
+    id: detail.id,
+    name: detail.name,
+    amount: detail.amount,
+    price: detail.price || 0,
+    total_price: detail.totalPrice || 0,
+    category: detail.category || '',
+  }));
+
+  console.log('This is detail items', detailItems, thumbnail_image, receipt_image);
+
+  const response = Response.defaultOK('List obtained successfully.', { detailItems, thumbnail_image, receipt_image });
+  return res.status(response.code).json(response);
+};
+
 export {
   createListHandler,
   getAllListHandler,
+  getListById,
 };
