@@ -74,6 +74,10 @@ const list = {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
+    totalItems : {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   options: {
     tableName: 'LIST',

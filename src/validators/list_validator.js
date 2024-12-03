@@ -33,6 +33,8 @@ const listValidator = (body) => {
       .optional(),
     total_expenses: Joi.number()
       .empty(''),
+    total_items: Joi.number()
+      .min(1),
     product_items: Joi.array()
       .items(productItemsArray)
       .min(1)

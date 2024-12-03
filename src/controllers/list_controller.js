@@ -48,6 +48,7 @@ const createListHandler = async (req, res) => {
       receiptImage: receiptImageName === null ? null : receiptImageName,
       thumbnailImage: thumbnailImageName === null ? null : thumbnailImageName,
       totalExpenses: reqBody.total_expenses === '' ? 0 : reqBody.total_expenses,
+      totalItems: reqBody.total_items,
       UserId: user.id,
     }, { transaction: t });
 
@@ -107,7 +108,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems'],
     });
   } else if (type === 'Plan') {
     trackLists = await List.findAll({
@@ -115,7 +116,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems'],
     });
   }
 
@@ -139,6 +140,7 @@ const getAllListHandler = async (req, res) => {
       listDTO.type = list.type;
       listDTO.total_expenses = list.totalExpenses || null;
       listDTO.total_products = count;
+      listDTO.total_items = list.totalItems;
 
       if (!list.thumbnailImage && !list.receiptImage) {
         listDTO.image = `${imagePrefix}default_images/default_image.png`;
