@@ -9,6 +9,17 @@ class Response {
     return res;
   }
 
+  static customOK(message, data, pagination) {
+    const res = {
+      status: true,
+      code: 200,
+      message,
+      data,
+      pagination,
+    };
+    return res;
+  }
+
   static defaultCreated(message, data) {
     const res = {
       status: true,

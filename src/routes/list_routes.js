@@ -6,13 +6,15 @@ import {
   deleteListHandler, 
   getAllListHandler, 
   getListById, 
-  updateListHandler
+  updateListHandler,
+  getAllListByDateHandler,
 } from '../controllers/list_controller.js';
 
 const listRoutes = express.Router();
 
 listRoutes.get('/test', (req, res) => { res.send('List routes are connected.'); });
 listRoutes.get('/', verifyToken, getAllListHandler);
+listRoutes.get('/filter', verifyToken, getAllListByDateHandler);
 listRoutes.get('/:listId', verifyToken, getListById);
 
 listRoutes.post('/', verifyToken, imageUploads, createListHandler);
