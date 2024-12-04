@@ -1,11 +1,13 @@
 /* eslint-disable camelcase */
 // import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
 import { sequelize } from '../models/definitions.js';
 import { User, List, ProductItem } from '../models/index.js';
 import { convertFileName } from '../utils/file_process.js';
-import { listValidator } from '../validators/index.js';
+import { listValidator, updateListValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
+
 // import { allLists, singleList } from '../dto/request.js';
 
 let response;
@@ -26,7 +28,6 @@ const createListHandler = async (req, res) => {
 
   if (reqFiles.receipt_image && typeof reqFiles.receipt_image === 'object') {
     receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
-    // thumbnailImageName = receiptImageName;
   }
 
   if (reqFiles.thumbnail_image && typeof reqFiles.thumbnail_image === 'object') {
@@ -90,10 +91,9 @@ const createListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
-
 // GET All List (Track or Plan)
 const getAllListHandler = async (req, res) => {
-  const { type } = req.query;
+  const { type, page = 1, limit = 10 } = req.query;
   const { decodedToken } = res.locals;
 
   if (type === null) {
@@ -103,13 +103,18 @@ const getAllListHandler = async (req, res) => {
 
   let trackLists;
 
+  const offset = (page - 1) * limit; 
+  const parsedLimit = parseInt(limit, 10);
+
   if (type === 'Track') {
     trackLists = await List.findAll({
       where: {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+      limit: parsedLimit,
+      offset,
     });
   } else if (type === 'Plan') {
     trackLists = await List.findAll({
@@ -118,6 +123,8 @@ const getAllListHandler = async (req, res) => {
         type,
       },
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems'],
+      limit: parsedLimit,
+      offset,
     });
   }
 
@@ -141,6 +148,115 @@ const getAllListHandler = async (req, res) => {
       listDTO.total_expenses = list.totalExpenses || null;
       listDTO.total_products = count;
       listDTO.total_items = list.totalItems;
+
+      if (!list.thumbnailImage && !list.receiptImage) {
+        listDTO.image = `${imagePrefix}default_images/default_image.png`;
+      } else {
+        listDTO.image = list.thumbnailImage
+          ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+          : `${imagePrefix}receipt_images/${list.receiptImage}`;
+      }
+
+      return listDTO;
+    })
+  );
+
+  const total = Object.keys(trackLists).length;
+  // const pagination = {
+  //   total,
+  //   page: parseInt(page, 10),
+  //   limit: parsedLimit,
+  //   totalPages: Math.ceil(total / parsedLimit),
+  // };
+
+  response = Response.customOK('List obtained successfully.', 
+    { lists }, 
+    { 
+      total,
+      page: parseInt(page, 10),
+      limit: parsedLimit,
+      totalPages: Math.ceil(total / parsedLimit), 
+    });
+  return res.status(response.code).json(response);
+};
+
+const getAllListByMonthHandler = async (req, res) => {
+  const { type } = req.query;
+  const { month } = req.query;
+  const { year } = req.query;
+  const { decodedToken } = res.locals;
+  console.log('Testtt', decodedToken.id, type, !month, !year);
+
+  if (type === null) {
+    response = Response.defaultBadRequest({ message: 'List type is missing.' });
+    return res.status(response.code).json(response);
+  }
+
+  if (!month && !year) {
+    response = Response.defaultBadRequest({ message: 'Date is missing.' });
+    return res.status(response.code).json(response);
+  }
+
+  let startDate;
+  let endDate;
+  if (!month) {
+    startDate = new Date(year - 1);
+    endDate = new Date(year);
+  } else {
+    startDate = new Date(year, month - 1, 1);
+    endDate = new Date(year, month, 0);
+  }
+  // const year = new Date().getFullYear();
+  let trackLists;
+
+  console.log(decodedToken.id, type, month);
+
+  if (type === 'Track') {
+    trackLists = await List.findAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+        createdAt: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+    });
+  } else if (type === 'Plan') {
+    trackLists = await List.findAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+        createdAt: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
+    });
+    console.log(decodedToken.id, List.type, List.createdAt);
+  }
+
+  if (!trackLists || trackLists.length === 0) {
+    response = Response.defaultNotFound('No lists found for this user');
+    return res.status(response.code).json(response);
+  }
+
+  const lists = await Promise.all(
+    trackLists.map(async (list) => {
+      const { count } = await ProductItem.findAndCountAll({
+        where: {
+          ListId: list.id,
+        },
+      });
+
+      const listDTO = {};
+      listDTO.id = list.id;
+      listDTO.title = list.title;
+      listDTO.type = list.type;
+      listDTO.total_expenses = list.totalExpenses || null;
+      listDTO.total_products = count;
+      listDTO.total_items = list.totalItems;
+      listDTO.createdAt = list.createdAt;
 
       if (!list.thumbnailImage && !list.receiptImage) {
         listDTO.image = `${imagePrefix}default_images/default_image.png`;
@@ -214,7 +330,7 @@ const updateListHandler = async (req, res) => {
 
   console.log(reqBody);
 
-  const reqError = listValidator(reqBody);
+  const reqError = updateListValidator(reqBody);
   if (reqError.length !== 0) {
     response = Response.defaultBadRequest({ errors: reqError });
     return res.status(response.code).json(response);
@@ -307,4 +423,5 @@ export {
   getListById,
   updateListHandler,
   deleteListHandler,
+  getAllListByMonthHandler,
 };
