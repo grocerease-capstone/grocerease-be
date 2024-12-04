@@ -101,7 +101,7 @@ const getAllListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  let trackLists;
+  let trackLists, trackCount;
 
   const offset = (page - 1) * limit; 
   const parsedLimit = parseInt(limit, 10);
@@ -116,6 +116,14 @@ const getAllListHandler = async (req, res) => {
       limit: parsedLimit,
       offset,
     });
+
+    trackCount = await List.findAndCountAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id'],
+    });
   } else if (type === 'Plan') {
     trackLists = await List.findAll({
       where: {
@@ -125,6 +133,14 @@ const getAllListHandler = async (req, res) => {
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems'],
       limit: parsedLimit,
       offset,
+    });
+
+    trackCount = await List.findAndCountAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id'],
     });
   }
 
@@ -161,79 +177,94 @@ const getAllListHandler = async (req, res) => {
     })
   );
 
-  const total = Object.keys(trackLists).length;
-  // const pagination = {
-  //   total,
-  //   page: parseInt(page, 10),
-  //   limit: parsedLimit,
-  //   totalPages: Math.ceil(total / parsedLimit),
-  // };
-
-  response = Response.customOK('List obtained successfully.', 
+  response = Response.customOK(
+    'List obtained successfully.', 
     { lists }, 
     { 
-      total,
+      total: trackCount.count,
       page: parseInt(page, 10),
       limit: parsedLimit,
-      totalPages: Math.ceil(total / parsedLimit), 
+      totalPages: Math.ceil(trackCount.count / parsedLimit), 
     });
   return res.status(response.code).json(response);
 };
 
-const getAllListByMonthHandler = async (req, res) => {
-  const { type } = req.query;
+const getAllListByDateHandler = async (req, res) => {
+  const { type, page = 1, limit = 10 } = req.query;
   const { month } = req.query;
   const { year } = req.query;
   const { decodedToken } = res.locals;
-  console.log('Testtt', decodedToken.id, type, !month, !year);
 
   if (type === null) {
     response = Response.defaultBadRequest({ message: 'List type is missing.' });
     return res.status(response.code).json(response);
   }
 
+  let startDate, endDate, createdAtCondition;
+
   if (!month && !year) {
-    response = Response.defaultBadRequest({ message: 'Date is missing.' });
+    createdAtCondition = undefined;
+  } else if (month < 1 || month > 12) {
+    response = Response.defaultBadRequest({ message: 'Month filter invalid.' });
     return res.status(response.code).json(response);
-  }
-
-  let startDate;
-  let endDate;
-  if (!month) {
-    startDate = new Date(year - 1);
-    endDate = new Date(year);
   } else {
-    startDate = new Date(year, month - 1, 1);
-    endDate = new Date(year, month, 0);
+    const currYear = new Date().getFullYear();
+    const targetYear = year || currYear;
+  
+    if (!month) {
+      startDate = new Date(targetYear, 0, 1);
+      endDate = new Date(targetYear, 11, 31, 23, 59, 59, 999);
+    } else {
+      startDate = new Date(targetYear, month - 1, 1);
+      endDate = new Date(targetYear, month, 0, 23, 59, 59, 999);
+    }
+  
+    createdAtCondition = { [Op.between]: [startDate, endDate] };
   }
-  // const year = new Date().getFullYear();
-  let trackLists;
+  
+  let trackLists, trackCount;
 
-  console.log(decodedToken.id, type, month);
+  const offset = (page - 1) * limit; 
+  const parsedLimit = parseInt(limit, 10);
 
   if (type === 'Track') {
     trackLists = await List.findAll({
       where: {
         UserId: decodedToken.id,
         type,
-        createdAt: {
-          [Op.between]: [startDate, endDate],
-        },
+        ...(createdAtCondition && { createdAt: createdAtCondition }),
       },
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+      limit: parsedLimit,
+      offset,
+    });
+
+    trackCount = await List.findAndCountAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id'],
     });
   } else if (type === 'Plan') {
     trackLists = await List.findAll({
       where: {
         UserId: decodedToken.id,
         type,
-        createdAt: {
-          [Op.between]: [startDate, endDate],
-        },
+        ...(createdAtCondition && { createdAt: createdAtCondition }),
       },
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
+      limit: parsedLimit,
+      offset,
     });
-    console.log(decodedToken.id, List.type, List.createdAt);
+
+    trackCount = await List.findAndCountAll({
+      where: {
+        UserId: decodedToken.id,
+        type,
+      },
+      attributes: ['id'],
+    });
   }
 
   if (!trackLists || trackLists.length === 0) {
@@ -270,7 +301,15 @@ const getAllListByMonthHandler = async (req, res) => {
     })
   );
 
-  response = Response.defaultOK('List obtained successfully.', { lists });
+  response = Response.customOK('Filtered list obtained successfully.', 
+    { lists },
+    { 
+      total: trackCount.count,
+      page: parseInt(page, 10),
+      limit: parsedLimit,
+      totalPages: Math.ceil(trackCount.count / parsedLimit), 
+    },
+  );
   return res.status(response.code).json(response);
 };
 
@@ -278,7 +317,7 @@ const getListById = async (req, res) => {
   const { listId } = req.params;
   
   if (listId <= 0) {
-    const response = Response.defaultBadRequest(null);
+    response = Response.defaultBadRequest(null);
     return res.status(response.code).json(response);
   }
 
@@ -290,13 +329,12 @@ const getListById = async (req, res) => {
       attributes: ['id', 'name', 'amount', 'price', 'totalPrice', 'category'],
     },
   }).catch((e) => {
-    console.error('Error fetching list details:', e);
-    const error = new Error(e);
-    throw error;
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
   });
 
   if (!detailList) {
-    const response = Response.defaultNotFound('List not found.');
+    response = Response.defaultNotFound('List not found.');
     return res.status(response.code).json(response);
   }
 
@@ -317,9 +355,7 @@ const getListById = async (req, res) => {
     category: detail.category || '',
   }));
 
-  console.log('This is detail items', detailItems, thumbnail_image, receipt_image);
-
-  const response = Response.defaultOK('List obtained successfully.', { detailItems, thumbnail_image, receipt_image });
+  response = Response.defaultOK('List obtained successfully.', { detailItems, thumbnail_image, receipt_image });
   return res.status(response.code).json(response);
 };
 
@@ -328,8 +364,6 @@ const updateListHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
 
-  console.log(reqBody);
-
   const reqError = updateListValidator(reqBody);
   if (reqError.length !== 0) {
     response = Response.defaultBadRequest({ errors: reqError });
@@ -337,7 +371,7 @@ const updateListHandler = async (req, res) => {
   }
 
   if (listId <= 0) {
-    const response = Response.defaultBadRequest(null);
+    response = Response.defaultBadRequest(null);
     return res.status(response.code).json(response);
   }
 
@@ -373,8 +407,8 @@ const updateListHandler = async (req, res) => {
     try {
       await product.save();
     } catch (e) {
-      const error = new Error(e);
-      return error;
+      response = Response.defaultInternalError({ e });
+      return res.status(response.code).json(response);
     }
   });
   
@@ -402,8 +436,6 @@ const updateListHandler = async (req, res) => {
 const deleteListHandler = async (req, res) => {
   const { listId } = req.params;
 
-  console.log(req.params);
-
   await List.destroy({
     where: {
       id: listId,
@@ -423,5 +455,5 @@ export {
   getListById,
   updateListHandler,
   deleteListHandler,
-  getAllListByMonthHandler,
+  getAllListByDateHandler,
 };
