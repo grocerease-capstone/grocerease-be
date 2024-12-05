@@ -146,7 +146,7 @@ const getAllListHandler = async (req, res) => {
   }
 
   if (!trackLists || trackLists.length === 0) {
-    response = Response.defaultNotFound('No lists found for this user');
+    response = Response.defaultOK('No lists found for this user');
     return res.status(response.code).json(response);
   }
 
@@ -270,7 +270,7 @@ const getAllListByDateHandler = async (req, res) => {
   }
 
   if (!trackLists || trackLists.length === 0) {
-    response = Response.defaultNotFound('No lists found for this user');
+    response = Response.defaultOK('No lists found for this user');
     return res.status(response.code).json(response);
   }
 
