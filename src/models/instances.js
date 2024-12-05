@@ -151,8 +151,8 @@ const userList = {
   name: 'user_list',
   attributes: {
     id: {
-      type: DataTypes.UUID,
-      allowNull: false,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       primaryKey: true,
     },
   },
@@ -162,6 +162,21 @@ const userList = {
   }
 };
 
+const tempUserList = {
+  name: 'temp_user_list',
+  attributes: {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+  },
+  options: {
+    tableName: 'temp_user_list',
+    timestamps: false,
+  },
+};
+
 export {
   user,
   list,
@@ -169,4 +184,5 @@ export {
   item,
   userList,
   productItem,
+  tempUserList,
 };

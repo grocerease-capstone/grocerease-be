@@ -8,6 +8,7 @@ import {
   getListById, 
   updateListHandler,
   getAllListByDateHandler,
+  acceptListHandler,
 } from '../controllers/list_controller.js';
 
 const listRoutes = express.Router();
@@ -18,6 +19,7 @@ listRoutes.get('/filter', verifyToken, getAllListByDateHandler);
 listRoutes.get('/:listId', verifyToken, getListById);
 
 listRoutes.post('/', verifyToken, imageUploads, createListHandler);
+// listRoutes.post('/', verifyToken, acceptListHandler);
 
 listRoutes.put('/:listId', verifyToken, imageUploads, updateListHandler);
 

@@ -4,6 +4,7 @@ import {
   Session,
   UserList,
   ProductItem,
+  TempUserList
 } from './definitions.js';
 
 User.hasMany(List);
@@ -21,6 +22,9 @@ Session.belongsTo(User, {
 User.belongsToMany(List, { through: UserList });
 List.belongsToMany(User, { through: UserList });
 
+User.belongsToMany(List, { through: TempUserList });
+List.belongsToMany(User, { through: TempUserList });
+
 List.hasMany(ProductItem);
 ProductItem.belongsTo(List, {
   foreignKey: 'ListId',
@@ -34,6 +38,7 @@ export {
   Session,
   UserList,
   ProductItem,
+  TempUserList
 };
 
 /*
