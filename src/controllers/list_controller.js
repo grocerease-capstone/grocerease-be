@@ -2,11 +2,12 @@
 // import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
 import { sequelize } from '../models/definitions.js';
-import { User, List, ProductItem } from '../models/index.js';
+import { User, List, ProductItem, UserList, TempUserList } from '../models/index.js';
 import { convertFileName } from '../utils/file_process.js';
 import { listValidator, updateListValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
+import { transaction } from '../../../mammates-be/src/models/model_raw.js';
 
 // import { allLists, singleList } from '../dto/request.js';
 
@@ -130,7 +131,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
       limit: parsedLimit,
       offset,
     });
@@ -164,6 +165,7 @@ const getAllListHandler = async (req, res) => {
       listDTO.total_expenses = list.totalExpenses || null;
       listDTO.total_products = count;
       listDTO.total_items = list.totalItems;
+      listDTO.createdAt = list.createdAt;
 
       if (!list.thumbnailImage && !list.receiptImage) {
         listDTO.image = `${imagePrefix}default_images/default_image.png`;
@@ -449,6 +451,83 @@ const deleteListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
+const inviteUserToList = async (req, res) => {
+  const { listId } = req.params;
+  const reqBody = req.body;
+  const reqUsers = reqBody.users;
+
+  if (listId <= 0) {
+    response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const createInviteListTransaction = async (t) => {
+    const invitedUsers = JSON.parse(reqUsers).map((user) => ({
+      UserId: user.userId,
+      ListId: user.listId,
+    }));
+
+    await TempUserList.bulkCreate(invitedUsers, { transaction: t });
+  };
+
+  try {
+    await sequelize.transaction(createInviteListTransaction);
+  } catch (e) {
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
+  }
+
+  response = Response.defaultOK('Users invited successfully.', null);
+  return res.status(response.code).json(response);
+};
+
+const acceptListHandler = async (req, res) => {
+  const { listId } = req.params;
+  const { decodedToken } = res.locals;
+  // const reqBody = req.body;
+  // const reqUsers = reqBody.users;
+
+  if (listId <= 0) {
+    response = Response.defaultBadRequest(null);
+    return res.status(response.code).json(response);
+  }
+
+  const acceptListTransaction = async (t) => {
+    const list = await List.findOne({
+      where: {
+        id: listId,
+      },
+    }, { transaction: t });
+    await UserList.create({
+      UserId: decodedToken.id,
+    });
+  };
+
+  // try {
+
+  // } catch (e) {
+
+  // }
+  const createShareListTransaction = async (t) => {
+    // const addedUsers = JSON.parse(reqUsers).map((user) => ({
+    //   UserId: user.userId,
+    //   ListId: user.listId,
+    // }));
+
+    // await UserList.bulkCreate(addedUsers, { transaction: t });
+  };
+
+  try {
+    await sequelize.transaction(createShareListTransaction);
+  } catch (e) {
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
+  }
+
+  response = Response.defaultOK('List shared successfully.', null);
+  return res.status(response.code).json(response);
+};
+
 export {
   createListHandler,
   getAllListHandler,
@@ -456,4 +535,6 @@ export {
   updateListHandler,
   deleteListHandler,
   getAllListByDateHandler,
+  acceptListHandler,
+  inviteUserToList,
 };
