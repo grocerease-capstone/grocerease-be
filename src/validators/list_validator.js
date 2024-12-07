@@ -35,6 +35,9 @@ const listValidator = (body) => {
       .empty(''),
     total_items: Joi.number()
       .min(1),
+    boughtAt: Joi.date()
+      .empty('')
+      .optional(),
     product_items: Joi.array()
       .items(productItemsArray)
       .min(1)

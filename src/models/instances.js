@@ -78,6 +78,10 @@ const list = {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    boughtAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   },
   options: {
     tableName: 'LIST',
