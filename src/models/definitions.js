@@ -1,11 +1,13 @@
-import getSequelize from '../config/orm.js';
+import { sequelize } from '../config/index.js';
 import {
   user,
   list,
-  session
+  session,
+  item,
+  userList,
+  productItem,
+  tempUserList,
 } from './instances.js';
-
-const sequelize = getSequelize();
 
 const User = sequelize.define(
   user.name,
@@ -25,10 +27,38 @@ const Session = sequelize.define(
   session.options,
 );
 
+const Item = sequelize.define(
+  item.name,
+  item.attributes,
+  item.options,
+);
+
+const UserList = sequelize.define(
+  userList.name,
+  userList.attributes,
+  userList.options,
+);
+
+const ProductItem = sequelize.define(
+  productItem.name,
+  productItem.attributes,
+  productItem.options,
+);
+
+const TempUserList = sequelize.define(
+  tempUserList.name,
+  tempUserList.attributes,
+  tempUserList.options,
+);
+
 export {
   User,
   List,
   Session,
+  Item,
+  UserList,
+  ProductItem,
+  TempUserList,
   sequelize,
 };
 
@@ -39,6 +69,4 @@ const Model_Name = sequelize.define(
   ins_name.attributes,
   ins_name.options,
 );
-
-
 */

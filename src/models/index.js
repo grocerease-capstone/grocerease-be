@@ -2,6 +2,9 @@
   User,
   List,
   Session,
+  UserList,
+  ProductItem,
+  TempUserList,
 } from './relations.js';
 import initDatabaseMigration from './migrate.js';
 
@@ -10,4 +13,7 @@ export {
   User,
   List,
   Session,
+  UserList,
+  ProductItem,
+  TempUserList,
 };

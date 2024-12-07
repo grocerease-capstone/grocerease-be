@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import getError from './errorCheck.js';
+import getError from './error_check.js';
 
 const registerValidator = (body) => {
   console.log('Body received for validation:', body);
