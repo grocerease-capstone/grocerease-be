@@ -4,12 +4,16 @@ import { registerValidator, loginValidator } from '../validators/index.js';
 import { User, Session } from '../models/index.js';
 import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
 import { createToken } from '../middlewares/jwt.js';
+import { convertFileName } from '../utils/file_process.js';
 import Response from '../dto/response.js';
 
 let response;
 
 const registerHandler = async (req, res) => {
   const reqBody = req.body;
+  const reqFiles = req.files;
+  const imagePrefix = 'profile_image/';
+  let profileImage;
   // console.log('Request Body:', req.body);
 
   const reqError = registerValidator(reqBody);
@@ -24,6 +28,12 @@ const registerHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
+  profileImage = `${imagePrefix}default_image.jpg`;
+
+  if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
+    profileImage = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+  }
+
   const userId = uuidv4();
   const password = await encrypt(reqBody.password);
 
@@ -33,6 +43,7 @@ const registerHandler = async (req, res) => {
       username: reqBody.username,
       email: reqBody.email,
       password,
+      image: profileImage,
     }, { transaction: t });
   };
   const result = await sequelize.transaction(userTransaction).catch((error) => error);
