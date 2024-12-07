@@ -7,7 +7,6 @@ import { convertFileName } from '../utils/file_process.js';
 import { listValidator, updateListValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
-import { transaction } from '../../../mammates-be/src/models/model_raw.js';
 
 // import { allLists, singleList } from '../dto/request.js';
 
@@ -35,6 +34,8 @@ const createListHandler = async (req, res) => {
     thumbnailImageName = convertFileName('thumbnail_images/', reqFiles.thumbnail_image[0].originalname);
   }
 
+  const date = new Date();
+
   const { decodedToken } = res.locals;
   const createListTransaction = async (t) => {
     const user = await User.findOne(
@@ -52,6 +53,7 @@ const createListHandler = async (req, res) => {
       thumbnailImage: thumbnailImageName === null ? null : thumbnailImageName,
       totalExpenses: reqBody.total_expenses === '' ? 0 : reqBody.total_expenses,
       totalItems: reqBody.total_items,
+      boughtAt: reqBody.boughtAt === '' ? date : reqBody.boughtAt,
       UserId: user.id,
     }, { transaction: t });
 
@@ -116,6 +118,7 @@ const getAllListHandler = async (req, res) => {
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
       limit: parsedLimit,
       offset,
+      order: [['boughtAt', 'DESC']],
     });
 
     trackCount = await List.findAndCountAll({
@@ -134,6 +137,7 @@ const getAllListHandler = async (req, res) => {
       attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
       limit: parsedLimit,
       offset,
+      order: [['boughtAt', 'DESC']],
     });
 
     trackCount = await List.findAndCountAll({
@@ -146,7 +150,7 @@ const getAllListHandler = async (req, res) => {
   }
 
   if (!trackLists || trackLists.length === 0) {
-    response = Response.defaultNotFound('No lists found for this user');
+    response = Response.defaultOK('No lists found for this user');
     return res.status(response.code).json(response);
   }
 
@@ -165,7 +169,7 @@ const getAllListHandler = async (req, res) => {
       listDTO.total_expenses = list.totalExpenses || null;
       listDTO.total_products = count;
       listDTO.total_items = list.totalItems;
-      listDTO.createdAt = list.createdAt;
+      listDTO.boughtAt = list.boughtAt;
 
       if (!list.thumbnailImage && !list.receiptImage) {
         listDTO.image = `${imagePrefix}default_images/default_image.png`;
@@ -202,10 +206,10 @@ const getAllListByDateHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  let startDate, endDate, createdAtCondition;
+  let startDate, endDate, boughtAtDate;
 
   if (!month && !year) {
-    createdAtCondition = undefined;
+    boughtAtDate = undefined;
   } else if (month < 1 || month > 12) {
     response = Response.defaultBadRequest({ message: 'Month filter invalid.' });
     return res.status(response.code).json(response);
@@ -221,7 +225,7 @@ const getAllListByDateHandler = async (req, res) => {
       endDate = new Date(targetYear, month, 0, 23, 59, 59, 999);
     }
   
-    createdAtCondition = { [Op.between]: [startDate, endDate] };
+    boughtAtDate = { [Op.between]: [startDate, endDate] };
   }
   
   let trackLists, trackCount;
@@ -234,11 +238,12 @@ const getAllListByDateHandler = async (req, res) => {
       where: {
         UserId: decodedToken.id,
         type,
-        ...(createdAtCondition && { createdAt: createdAtCondition }),
+        ...(boughtAtDate && { boughtAt: boughtAtDate }),
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
+      order: [['boughtAt', 'DESC']],
     });
 
     trackCount = await List.findAndCountAll({
@@ -253,11 +258,12 @@ const getAllListByDateHandler = async (req, res) => {
       where: {
         UserId: decodedToken.id,
         type,
-        ...(createdAtCondition && { createdAt: createdAtCondition }),
+        ...(boughtAtDate && { boughtAt: boughtAtDate }),
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
+      order: [['boughtAt', 'DESC']],
     });
 
     trackCount = await List.findAndCountAll({
@@ -270,7 +276,7 @@ const getAllListByDateHandler = async (req, res) => {
   }
 
   if (!trackLists || trackLists.length === 0) {
-    response = Response.defaultNotFound('No lists found for this user');
+    response = Response.defaultOK('No lists found for this user');
     return res.status(response.code).json(response);
   }
 
@@ -289,7 +295,7 @@ const getAllListByDateHandler = async (req, res) => {
       listDTO.total_expenses = list.totalExpenses || null;
       listDTO.total_products = count;
       listDTO.total_items = list.totalItems;
-      listDTO.createdAt = list.createdAt;
+      listDTO.boughtAt = list.boughtAt;
 
       if (!list.thumbnailImage && !list.receiptImage) {
         listDTO.image = `${imagePrefix}default_images/default_image.png`;
@@ -438,6 +444,15 @@ const updateListHandler = async (req, res) => {
 const deleteListHandler = async (req, res) => {
   const { listId } = req.params;
 
+  // await ProductItem.destroy({
+  //   where: {
+  //     ListId: listId,
+  //   },
+  // }).catch((e) => {
+  //   response = Response.defaultInternalError({ e });
+  //   return res.status(response.code).json(response);
+  // });
+
   await List.destroy({
     where: {
       id: listId,
@@ -492,16 +507,16 @@ const acceptListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const acceptListTransaction = async (t) => {
-    const list = await List.findOne({
-      where: {
-        id: listId,
-      },
-    }, { transaction: t });
-    await UserList.create({
-      UserId: decodedToken.id,
-    });
-  };
+  // const acceptListTransaction = async (t) => {
+  //   const list = await List.findOne({
+  //     where: {
+  //       id: listId,
+  //     },
+  //   }, { transaction: t });
+  //   await UserList.create({
+  //     UserId: decodedToken.id,
+  //   });
+  // };
 
   // try {
 
