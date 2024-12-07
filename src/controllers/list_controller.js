@@ -76,9 +76,9 @@ const createListHandler = async (req, res) => {
   }
 
   // Cloud Upload
-  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptName, reqFiles.mam_image[0].buffer);
+  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
   // if (thumbnailImageName) {
-  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.image[0].buffer);
+  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   // }
 
   // Local Upload
@@ -115,7 +115,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -134,7 +134,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
