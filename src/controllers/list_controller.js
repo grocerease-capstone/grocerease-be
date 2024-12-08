@@ -76,19 +76,22 @@ const createListHandler = async (req, res) => {
   }
 
   // Cloud Upload
-  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
-  // if (thumbnailImageName) {
-  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
-  // }
-
-  // Local Upload
   if (receiptImageName) {
-    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, receiptImageName, reqFiles.receipt_image[0].buffer);
   }
 
   if (thumbnailImageName) {
-    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   }
+
+  // Local Upload
+  // if (receiptImageName) {
+  //   await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+  // }
+
+  // if (thumbnailImageName) {
+  //   await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+  // }
 
   response = Response.defaultOK('New list added successfully.', null);
   return res.status(response.code).json(response);
@@ -400,38 +403,42 @@ const updateListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const currentProduct = currentList.Product_Items;
   const reqProductItems = reqBody.product_items;
 
-  currentProduct.map(async (product) => {
-    const updatedProduct = reqProductItems.find((p) => p.id === product.id);
-
-    product.name = updatedProduct.name;
-    product.amount = updatedProduct.amount;
-    product.price = updatedProduct.price;
-    product.totalPrice = updatedProduct.totalPrice;
-    product.category = updatedProduct.category;
-
-    try {
-      await product.save();
-    } catch (e) {
-      response = Response.defaultInternalError({ e });
-      return res.status(response.code).json(response);
-    }
+  const productUpdates = reqProductItems.map((updatedProduct) => {
+    return ProductItem.update(
+      {
+        name: updatedProduct.name,
+        amount: updatedProduct.amount,
+        price: updatedProduct.price,
+        totalPrice: updatedProduct.totalPrice,
+        category: updatedProduct.category
+      },
+      {
+        where: { id: updatedProduct.id }
+      }
+    );
   });
+
+  // Wait for all product updates
+  await Promise.all(productUpdates);
   
-  currentList.id = listId;
+  // currentList.id = listId;
   currentList.title = reqBody.title;
 
   if (reqBody.receiptImage && reqFiles.receipt_image) {
     const receiptImageName = reqBody.receiptImage;
-    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+    // await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+
+    await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
     currentList.receiptImage = receiptImageName;
   }
 
   if (reqBody.thumbnailImage && reqFiles.thumbnail_image) {
     const thumbnailImageName = reqBody.thumbnailImage;
-    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    // await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+
+    await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
     currentList.thumbnailImage = thumbnailImageName;
   }
 

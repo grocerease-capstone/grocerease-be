@@ -5,7 +5,7 @@ import {
   createListHandler, 
   deleteListHandler, 
   getAllListHandler, 
-  getListById, 
+  getListById,
   updateListHandler,
   getAllListByDateHandler,
   acceptListHandler,

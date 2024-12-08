@@ -6,6 +6,7 @@ import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
 import { createToken } from '../middlewares/jwt.js';
 import { convertFileName } from '../utils/file_process.js';
 import Response from '../dto/response.js';
+import uploadFileToStorage from '../config/storage.js';
 
 let response;
 
@@ -14,7 +15,6 @@ const registerHandler = async (req, res) => {
   const reqFiles = req.files;
   const imagePrefix = 'profile_image/';
   let profileImage;
-  // console.log('Request Body:', req.body);
 
   const reqError = registerValidator(reqBody);
   if (reqError.length !== 0) {
@@ -32,6 +32,8 @@ const registerHandler = async (req, res) => {
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
     profileImage = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+
+    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImage, reqFiles.profile_image[0].buffer);
   }
 
   const userId = uuidv4();
