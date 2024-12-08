@@ -6,6 +6,7 @@ import {
   item,
   userList,
   productItem,
+  tempUserList,
 } from './instances.js';
 
 const User = sequelize.define(
@@ -44,6 +45,12 @@ const ProductItem = sequelize.define(
   productItem.options,
 );
 
+const TempUserList = sequelize.define(
+  tempUserList.name,
+  tempUserList.attributes,
+  tempUserList.options,
+);
+
 export {
   User,
   List,
@@ -51,6 +58,7 @@ export {
   Item,
   UserList,
   ProductItem,
+  TempUserList,
   sequelize,
 };
 

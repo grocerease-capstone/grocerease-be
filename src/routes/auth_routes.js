@@ -1,14 +1,16 @@
 import express from 'express';
+import { profileUpload } from '../middlewares/index.js';
+import { verifyToken } from '../middlewares/jwt.js';
 import {
   registerHandler,
   loginHandler,
   logoutHandler,
 } from '../controllers/index.js';
-import { verifyToken } from '../middlewares/jwt.js';
+
 
 const authRoutes = express.Router();
 
-authRoutes.post('/register', registerHandler);
+authRoutes.post('/register', profileUpload, registerHandler);
 authRoutes.post('/login', loginHandler);
 authRoutes.post('/logout', verifyToken, logoutHandler);
 

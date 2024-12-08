@@ -1,5 +1,6 @@
 ﻿import authRoutes from './auth_routes.js';
 import listRoutes from './list_routes.js';
+import userRoutes from './user_routes.js';
 import { verifyToken } from '../middlewares/jwt.js';
 
 const appRoutes = (app) => {
@@ -21,6 +22,7 @@ const appRoutes = (app) => {
 
   app.use('/auth', authRoutes);
   app.use('/list', listRoutes);
+  app.use('/user', verifyToken, userRoutes);
 
   return app;
 };
