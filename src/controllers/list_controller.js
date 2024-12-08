@@ -76,9 +76,9 @@ const createListHandler = async (req, res) => {
   }
 
   // Cloud Upload
-  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptName, reqFiles.mam_image[0].buffer);
+  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
   // if (thumbnailImageName) {
-  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.image[0].buffer);
+  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   // }
 
   // Local Upload
@@ -115,7 +115,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -134,7 +134,7 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'createdAt'],
+      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'boughtAt'],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -331,7 +331,7 @@ const getListById = async (req, res) => {
 
   const detailList = await List.findOne({
     where: { id: listId },
-    attributes: ['title', 'receiptImage', 'thumbnailImage'],
+    attributes: ['title', 'receiptImage', 'thumbnailImage', 'boughtAt'],
     include: {
       model: ProductItem,
       attributes: ['id', 'name', 'amount', 'price', 'totalPrice', 'category'],
@@ -363,7 +363,7 @@ const getListById = async (req, res) => {
     category: detail.category || '',
   }));
 
-  response = Response.defaultOK('List obtained successfully.', { detailItems, thumbnail_image, receipt_image });
+  response = Response.defaultOK('List obtained successfully.', { detailList, detailItems, thumbnail_image, receipt_image });
   return res.status(response.code).json(response);
 };
 
@@ -443,15 +443,6 @@ const updateListHandler = async (req, res) => {
 
 const deleteListHandler = async (req, res) => {
   const { listId } = req.params;
-
-  // await ProductItem.destroy({
-  //   where: {
-  //     ListId: listId,
-  //   },
-  // }).catch((e) => {
-  //   response = Response.defaultInternalError({ e });
-  //   return res.status(response.code).json(response);
-  // });
 
   await List.destroy({
     where: {

@@ -18,10 +18,16 @@ const upload = multer({
       'image/jpg',
       'image/png',
     ];
+
     if (!validMimeType.includes(file.mimetype)) {
-      cb(new Error('Invalid image format'), false);
+      return cb(new Error('Invalid image format'), false);
     }
-    cb(null, true);
+
+    if (file.size > 2000000) {
+      return cb(new Error('File size exceeds 2MB'), false);
+    }
+
+    return cb(null, true);
   },
   storage: multer.memoryStorage(),
 });
@@ -31,7 +37,12 @@ const imageUploads = upload.fields([
   { name: 'thumbnail_image', maxCount: 1 },
 ]);
 
+const profileUpload = upload.fields([
+  { name: 'profile_image', maxCount: 1 },
+]);
+
 export {
   convertFileName,
-  imageUploads
+  imageUploads,
+  profileUpload,
 };

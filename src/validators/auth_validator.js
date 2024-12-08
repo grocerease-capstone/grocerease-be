@@ -2,7 +2,6 @@ import Joi from 'joi';
 import getError from './error_check.js';
 
 const registerValidator = (body) => {
-  console.log('Body received for validation:', body);
   const userRegister = Joi.object({
     username: Joi.string()
       .min(4)
@@ -13,12 +12,14 @@ const registerValidator = (body) => {
     password: Joi.string()
       .min(8)
       .required(),
-    passwordRepeat: Joi.valid(Joi.ref('password')).required()
+    password_repeat: Joi.valid(Joi.ref('password')).required()
       .messages({ 'any.only': 'Passwords must match' }),
+    profile_image: Joi.string()
+      .empty('')
+      .optional(),
   });
 
   const error = userRegister.validate(body, { abortEarly: false });
-  console.log('this is the erros: ', error);
   return getError(error);
 };
 

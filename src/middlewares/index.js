@@ -1,5 +1,6 @@
-﻿import { imageUploads } from '../utils/file_process.js';
+﻿import { imageUploads, profileUpload } from '../utils/file_process.js';
 
 export {
   imageUploads,
+  profileUpload,
 };
