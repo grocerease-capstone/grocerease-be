@@ -6,15 +6,15 @@ import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
 import { createToken } from '../middlewares/jwt.js';
 import { convertFileName } from '../utils/file_process.js';
 import Response from '../dto/response.js';
+import uploadFileToStorage from '../config/storage.js';
 
 let response;
 
 const registerHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
-  const imagePrefix = 'profile_image/';
-  let profileImage;
-  // console.log('Request Body:', req.body);
+  const imagePrefix = 'profile_images/';
+  let profileImageName;
 
   const reqError = registerValidator(reqBody);
   if (reqError.length !== 0) {
@@ -28,10 +28,13 @@ const registerHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  profileImage = `${imagePrefix}default_image.jpg`;
+  profileImageName = `${imagePrefix}default_image.jpg`;
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
-    profileImage = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+    profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+    await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
+
+    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
   }
 
   const userId = uuidv4();
@@ -43,7 +46,7 @@ const registerHandler = async (req, res) => {
       username: reqBody.username,
       email: reqBody.email,
       password,
-      image: profileImage,
+      image: profileImageName,
     }, { transaction: t });
   };
   const result = await sequelize.transaction(userTransaction).catch((error) => error);
