@@ -84,9 +84,12 @@ const createListHandler = async (req, res) => {
   }
 
   // Cloud Upload
-  // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
+  // if (receiptImageName) {
+  //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, receiptImageName, reqFiles.receipt_image[0].buffer);
+  // }
+
   // if (thumbnailImageName) {
-  //   await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+  //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   // }
 
   // Local Upload

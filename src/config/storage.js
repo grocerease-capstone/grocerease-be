@@ -15,6 +15,7 @@ const storage = new Storage({
 
 // Cloud Bucket
 // const uploadFileToStorage = async (bucketName, fileName, contents) => {
+//   console.log('It uploads.', process.env.GC_KEY_FILE, process.env.GC_STORAGE_BUCKET);
 //   await storage.bucket(bucketName).file(fileName).save(contents);
 // };
 

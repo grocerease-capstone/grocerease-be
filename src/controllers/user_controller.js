@@ -47,6 +47,8 @@ const updateUserHandler = async (req, res) => {
     const profileImageName = convertFileName('profile_images/', reqFiles.profile_image[0].originalname);
     await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
 
+    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
+
     currentUser.image = profileImageName;
   }
 
