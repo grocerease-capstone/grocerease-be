@@ -25,11 +25,31 @@ ProductItem.belongsTo(List, {
   onUpdate: 'CASCADE',
 });
 
-User.belongsToMany(List, { through: UserList });
-List.belongsToMany(User, { through: UserList });
+User.belongsToMany(List, { 
+  through: UserList, 
+  foreignKey: 'InvitedId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
 
-User.belongsToMany(List, { through: TempUserList });
-List.belongsToMany(User, { through: TempUserList });
+List.belongsToMany(User, { 
+  through: UserList, 
+  foreignKey: 'ListId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
+
+User.belongsToMany(List, { 
+  through: TempUserList, 
+  foreignKey: 'InvitedId', 
+  onDelete: 'CASCADE', 
+  hooks: true  });
+List.belongsToMany(User, { 
+  through: TempUserList,
+  foreignKey: 'ListId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
 
 export {
   User,

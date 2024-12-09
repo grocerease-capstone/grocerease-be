@@ -2,30 +2,38 @@
 // import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
 import { sequelize } from '../models/definitions.js';
-import { User, List, ProductItem, UserList, TempUserList } from '../models/index.js';
+import {
+  User,
+  List,
+  ProductItem,
+  UserList,
+  TempUserList,
+} from '../models/index.js';
 import { convertFileName } from '../utils/file_process.js';
 import { listValidator, updateListValidator } from '../validators/index.js';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
 
-// import { allLists, singleList } from '../dto/request.js';
-
 let response;
 const imagePrefix = '../../image_upload/';
+const default_receipt = 'default_images/default_noreceipt.jpg';
 
 // POST List (Track or Plan)
 const createListHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
   const reqProductItems = reqBody.product_items;
-  let thumbnailImageName, receiptImageName;
+  // let receiptImageName = default_receipt;
+  // let thumbnailImageName = default_receipt;
+
+  let receiptImageName, thumbnailImageName;
 
   const reqError = listValidator(reqBody);
   if (reqError.length !== 0) {
     response = Response.defaultBadRequest({ errors: reqError });
     return res.status(response.code).json(response);
   }
-
+  
   if (reqFiles.receipt_image && typeof reqFiles.receipt_image === 'object') {
     receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
   }
@@ -49,8 +57,8 @@ const createListHandler = async (req, res) => {
     const createList = await List.create({
       title: reqBody.title,
       type: reqBody.type,
-      receiptImage: receiptImageName === null ? null : receiptImageName,
-      thumbnailImage: thumbnailImageName === null ? null : thumbnailImageName,
+      receiptImage: receiptImageName ? receiptImageName : default_receipt,
+      thumbnailImage: thumbnailImageName ? thumbnailImageName : default_receipt,
       totalExpenses: reqBody.total_expenses === '' ? 0 : reqBody.total_expenses,
       totalItems: reqBody.total_items,
       boughtAt: reqBody.boughtAt === '' ? date : reqBody.boughtAt,
@@ -86,11 +94,19 @@ const createListHandler = async (req, res) => {
 
   // Local Upload
   if (receiptImageName) {
-    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+    await uploadFileToStorage(
+      '../../image_upload',
+      receiptImageName,
+      reqFiles.receipt_image[0].buffer
+    );
   }
 
   if (thumbnailImageName) {
-    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    await uploadFileToStorage(
+      '../../image_upload',
+      thumbnailImageName,
+      reqFiles.thumbnail_image[0].buffer
+    );
   }
 
   response = Response.defaultOK('New list added successfully.', null);
@@ -109,7 +125,7 @@ const getAllListHandler = async (req, res) => {
 
   let trackLists, trackCount;
 
-  const offset = (page - 1) * limit; 
+  const offset = (page - 1) * limit;
   const parsedLimit = parseInt(limit, 10);
 
   if (type === 'Track') {
@@ -118,7 +134,16 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'boughtAt'],
+      attributes: [
+        'id',
+        'title',
+        'receiptImage',
+        'thumbnailImage',
+        'type',
+        'totalExpenses',
+        'totalItems',
+        'boughtAt',
+      ],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -137,7 +162,15 @@ const getAllListHandler = async (req, res) => {
         UserId: decodedToken.id,
         type,
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'boughtAt'],
+      attributes: [
+        'id',
+        'title',
+        'receiptImage',
+        'thumbnailImage',
+        'type',
+        'totalItems',
+        'boughtAt',
+      ],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -187,14 +220,15 @@ const getAllListHandler = async (req, res) => {
   );
 
   response = Response.customOK(
-    'List obtained successfully.', 
-    { lists }, 
-    { 
+    'List obtained successfully.',
+    { lists },
+    {
       total: trackCount.count,
       page: parseInt(page, 10),
       limit: parsedLimit,
-      totalPages: Math.ceil(trackCount.count / parsedLimit), 
-    });
+      totalPages: Math.ceil(trackCount.count / parsedLimit),
+    }
+  );
   return res.status(response.code).json(response);
 };
 
@@ -219,7 +253,7 @@ const getAllListByDateHandler = async (req, res) => {
   } else {
     const currYear = new Date().getFullYear();
     const targetYear = year || currYear;
-  
+
     if (!month) {
       startDate = new Date(targetYear, 0, 1);
       endDate = new Date(targetYear, 11, 31, 23, 59, 59, 999);
@@ -227,13 +261,13 @@ const getAllListByDateHandler = async (req, res) => {
       startDate = new Date(targetYear, month - 1, 1);
       endDate = new Date(targetYear, month, 0, 23, 59, 59, 999);
     }
-  
+
     boughtAtDate = { [Op.between]: [startDate, endDate] };
   }
-  
+
   let trackLists, trackCount;
 
-  const offset = (page - 1) * limit; 
+  const offset = (page - 1) * limit;
   const parsedLimit = parseInt(limit, 10);
 
   if (type === 'Track') {
@@ -243,7 +277,16 @@ const getAllListByDateHandler = async (req, res) => {
         type,
         ...(boughtAtDate && { boughtAt: boughtAtDate }),
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalExpenses', 'totalItems', 'boughtAt'],
+      attributes: [
+        'id',
+        'title',
+        'receiptImage',
+        'thumbnailImage',
+        'type',
+        'totalExpenses',
+        'totalItems',
+        'boughtAt',
+      ],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -263,7 +306,15 @@ const getAllListByDateHandler = async (req, res) => {
         type,
         ...(boughtAtDate && { boughtAt: boughtAtDate }),
       },
-      attributes: ['id', 'title', 'receiptImage', 'thumbnailImage', 'type', 'totalItems', 'boughtAt'],
+      attributes: [
+        'id',
+        'title',
+        'receiptImage',
+        'thumbnailImage',
+        'type',
+        'totalItems',
+        'boughtAt',
+      ],
       limit: parsedLimit,
       offset,
       order: [['boughtAt', 'DESC']],
@@ -312,21 +363,22 @@ const getAllListByDateHandler = async (req, res) => {
     })
   );
 
-  response = Response.customOK('Filtered list obtained successfully.', 
+  response = Response.customOK(
+    'Filtered list obtained successfully.',
     { lists },
-    { 
+    {
       total: trackCount.count,
       page: parseInt(page, 10),
       limit: parsedLimit,
-      totalPages: Math.ceil(trackCount.count / parsedLimit), 
-    },
+      totalPages: Math.ceil(trackCount.count / parsedLimit),
+    }
   );
   return res.status(response.code).json(response);
 };
 
 const getListById = async (req, res) => {
   const { listId } = req.params;
-  
+
   if (listId <= 0) {
     response = Response.defaultBadRequest(null);
     return res.status(response.code).json(response);
@@ -366,14 +418,18 @@ const getListById = async (req, res) => {
     category: detail.category || '',
   }));
 
-  response = Response.defaultOK('List obtained successfully.', { detailList, detailItems, thumbnail_image, receipt_image });
+  response = Response.defaultOK('List obtained successfully.', {
+    detailList,
+    detailItems,
+    thumbnail_image,
+    receipt_image,
+  });
   return res.status(response.code).json(response);
 };
 
 const updateListHandler = async (req, res) => {
   const { listId } = req.params;
   const reqBody = req.body;
-  const reqFiles = req.files;
 
   const reqError = updateListValidator(reqBody);
   if (reqError.length !== 0) {
@@ -386,65 +442,33 @@ const updateListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  const currentList = await List.findOne({
-    where: { id: listId },
-    attributes: ['id', 'title', 'receiptImage', 'thumbnailImage'],
-    include: {
-      model: ProductItem,
-      attributes: ['id', 'name', 'amount', 'price', 'totalPrice', 'category'],
-    },
-  }).catch((e) => {
+  try {
+    await sequelize.transaction(async (tx) => {
+      await List.update({
+        title: reqBody.title,
+        totalExpenses: reqBody.total_expenses,
+        totalItems: reqBody.total_items,
+        updatedAt: new Date(),
+      },
+      { where: { id: listId }, transaction: tx });
+
+      for (const { id, name, amount, price, total_price, category } of reqBody.product_items) {
+        console.log({ id, name, amount });
+        await ProductItem.update({
+          name,
+          amount,
+          price,
+          totalPrice: total_price,
+          category,
+        }, { where: { id }, transaction: tx });
+      }
+    });
+  } catch (e) {
     response = Response.defaultInternalError({ e });
     return res.status(response.code).json(response);
-  });
-
-  if (currentList instanceof Error) {
-    response = Response.defaultNotFound(null);
-    return res.status(response.code).json(response);
   }
 
-  const reqProductItems = reqBody.product_items;
-
-  const productUpdates = reqProductItems.map((updatedProduct) => {
-    return ProductItem.update(
-      {
-        name: updatedProduct.name,
-        amount: updatedProduct.amount,
-        price: updatedProduct.price,
-        totalPrice: updatedProduct.totalPrice,
-        category: updatedProduct.category
-      },
-      {
-        where: { id: updatedProduct.id }
-      }
-    );
-  });
-
-  // Wait for all product updates
-  await Promise.all(productUpdates);
-  
-  // currentList.id = listId;
-  currentList.title = reqBody.title;
-
-  if (reqBody.receiptImage && reqFiles.receipt_image) {
-    const receiptImageName = reqBody.receiptImage;
-    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
-
-    // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
-    currentList.receiptImage = receiptImageName;
-  }
-
-  if (reqBody.thumbnailImage && reqFiles.thumbnail_image) {
-    const thumbnailImageName = reqBody.thumbnailImage;
-    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
-
-    // await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
-    currentList.thumbnailImage = thumbnailImageName;
-  }
-
-  await currentList.save();
-
-  response = Response.defaultOK('New list added successfully.');
+  response = Response.defaultOK('List updated successfully.');
   return res.status(response.code).json(response);
 };
 
@@ -464,26 +488,44 @@ const deleteListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
-const inviteUserToList = async (req, res) => {
-  const { listId } = req.params;
+// query params: listId,
+const inviteToListHandler = async (req, res) => {
+  const { listId } = req.query;
   const reqBody = req.body;
-  const reqUsers = reqBody.users;
+  // const reqUsers = reqBody.users;
 
   if (listId <= 0) {
     response = Response.defaultBadRequest(null);
     return res.status(response.code).json(response);
   }
 
-  const createInviteListTransaction = async (t) => {
-    const invitedUsers = JSON.parse(reqUsers).map((user) => ({
-      UserId: user.userId,
-      ListId: user.listId,
-    }));
+  const invitedUser = await User.findOne({
+    where: {
+      email: reqBody.email,
+    },
+    attributes: ['id'],
+  }).catch((e) => {
+    response = Response.defaultInternalError({ e });
+    return res.status(response.code).json(response);
+  });
 
-    await TempUserList.bulkCreate(invitedUsers, { transaction: t });
+  if (!invitedUser) {
+    response = Response.defaultNotFound('User not found.');
+    return res.status(response.code).json(response);
+  }
+
+  const createInviteListTransaction = async (t) => {
+    await TempUserList.create(
+      {
+        userId: invitedUser.id,
+        listId,
+      },
+      { transaction: t }
+    );
   };
 
   try {
+    console.log(invitedUser.id, invitedUser.listId, listId);
     await sequelize.transaction(createInviteListTransaction);
   } catch (e) {
     response = Response.defaultInternalError({ e });
@@ -497,7 +539,7 @@ const inviteUserToList = async (req, res) => {
 const acceptListHandler = async (req, res) => {
   const { listId } = req.params;
   const { decodedToken } = res.locals;
-  // const reqBody = req.body;
+  const reqBody = req.body;
   // const reqUsers = reqBody.users;
 
   if (listId <= 0) {
@@ -505,16 +547,20 @@ const acceptListHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  // const acceptListTransaction = async (t) => {
-  //   const list = await List.findOne({
-  //     where: {
-  //       id: listId,
-  //     },
-  //   }, { transaction: t });
-  //   await UserList.create({
-  //     UserId: decodedToken.id,
-  //   });
-  // };
+  const acceptListTransaction = async (t) => {
+    const list = await List.findOne(
+      {
+        where: {
+          id: listId,
+        },
+      },
+      { transaction: t }
+    );
+    await UserList.create({
+      listId: listId,
+      UserId: reqBody.userId,
+    });
+  };
 
   // try {
 
@@ -526,7 +572,6 @@ const acceptListHandler = async (req, res) => {
     //   UserId: user.userId,
     //   ListId: user.listId,
     // }));
-
     // await UserList.bulkCreate(addedUsers, { transaction: t });
   };
 
@@ -549,5 +594,5 @@ export {
   deleteListHandler,
   getAllListByDateHandler,
   acceptListHandler,
-  inviteUserToList,
+  inviteToListHandler,
 };

@@ -13,7 +13,9 @@ let response;
 const registerHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
-  const imagePrefix = 'profile_image/';
+
+  const imagePrefix = 'profile_images/';
+  
   let profileImageName;
 
   const reqError = registerValidator(reqBody);
