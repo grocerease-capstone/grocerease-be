@@ -32,8 +32,9 @@ const registerHandler = async (req, res) => {
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
     profileImage = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+    await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
 
-    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImage, reqFiles.profile_image[0].buffer);
+    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImage, reqFiles.profile_image[0].buffer);
   }
 
   const userId = uuidv4();

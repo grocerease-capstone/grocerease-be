@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+﻿/* eslint-disable camelcase */
 // import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
 import { sequelize } from '../models/definitions.js';
@@ -76,22 +76,22 @@ const createListHandler = async (req, res) => {
   }
 
   // Cloud Upload
-  if (receiptImageName) {
-    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, receiptImageName, reqFiles.receipt_image[0].buffer);
-  }
-
-  if (thumbnailImageName) {
-    await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
-  }
-
-  // Local Upload
   // if (receiptImageName) {
-  //   await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+  //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, receiptImageName, reqFiles.receipt_image[0].buffer);
   // }
 
   // if (thumbnailImageName) {
-  //   await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+  //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
   // }
+
+  // Local Upload
+  if (receiptImageName) {
+    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+  }
+
+  if (thumbnailImageName) {
+    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+  }
 
   response = Response.defaultOK('New list added successfully.', null);
   return res.status(response.code).json(response);
@@ -428,17 +428,17 @@ const updateListHandler = async (req, res) => {
 
   if (reqBody.receiptImage && reqFiles.receipt_image) {
     const receiptImageName = reqBody.receiptImage;
-    // await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
+    await uploadFileToStorage('../../image_upload', receiptImageName, reqFiles.receipt_image[0].buffer);
 
-    await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
+    // await uploadFileToStorage(process.env.BUCKET_NAME, receiptImageName, reqFiles.receipt_image[0].buffer);
     currentList.receiptImage = receiptImageName;
   }
 
   if (reqBody.thumbnailImage && reqFiles.thumbnail_image) {
     const thumbnailImageName = reqBody.thumbnailImage;
-    // await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    await uploadFileToStorage('../../image_upload', thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
 
-    await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
+    // await uploadFileToStorage(process.env.BUCKET_NAME, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
     currentList.thumbnailImage = thumbnailImageName;
   }
 
