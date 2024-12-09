@@ -10,7 +10,7 @@ import {
 const userRoutes = express.Router();
 
 userRoutes.get('/', getUserByIdHandler);
-userRoutes.post('/', profileUpload, updateUserHandler);
+userRoutes.put('/', profileUpload, updateUserHandler);
 userRoutes.delete('/', deleteUserHandler);
 
 export default userRoutes;
