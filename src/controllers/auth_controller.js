@@ -14,7 +14,7 @@ const registerHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
   const imagePrefix = 'profile_image/';
-  let profileImage;
+  let profileImageName;
 
   const reqError = registerValidator(reqBody);
   if (reqError.length !== 0) {
@@ -28,13 +28,13 @@ const registerHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  profileImage = `${imagePrefix}default_image.jpg`;
+  profileImageName = `${imagePrefix}default_image.jpg`;
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
-    profileImage = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+    profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
     await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
 
-    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImage, reqFiles.profile_image[0].buffer);
+    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
   }
 
   const userId = uuidv4();
