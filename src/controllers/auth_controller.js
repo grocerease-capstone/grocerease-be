@@ -46,7 +46,7 @@ const registerHandler = async (req, res) => {
       username: reqBody.username,
       email: reqBody.email,
       password,
-      image: profileImage,
+      image: profileImageName,
     }, { transaction: t });
   };
   const result = await sequelize.transaction(userTransaction).catch((error) => error);
