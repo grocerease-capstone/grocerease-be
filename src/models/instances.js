@@ -128,32 +128,32 @@ const productItem = {
   }
 };
 
-const item = {
-  name: 'Item',
-  attributes: {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    brand: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-    },
-  },
-  options: {
-    tableName: 'ITEM',
-    timestamps: false,
-  }
-};
+// const item = {
+//   name: 'Item',
+//   attributes: {
+//     id: {
+//       type: DataTypes.INTEGER,
+//       primaryKey: true,
+//       autoIncrement: true,
+//     },
+//     name: {
+//       type: DataTypes.STRING,
+//       allowNull: true,
+//     },
+//     brand: {
+//       type: DataTypes.STRING,
+//       allowNull: true,
+//     },
+//     price: {
+//       type: DataTypes.DECIMAL,
+//       allowNull: true,
+//     },
+//   },
+//   options: {
+//     tableName: 'ITEM',
+//     timestamps: false,
+//   }
+// };
 
 const userList = {
   name: 'user_list',
@@ -170,8 +170,8 @@ const userList = {
   }
 };
 
-const tempUserList = {
-  name: 'temp_user_list',
+const shareRequests = {
+  name: 'share_requests',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -180,7 +180,7 @@ const tempUserList = {
     },
   },
   options: {
-    tableName: 'temp_user_list',
+    tableName: 'share_requests',
     timestamps: false,
   },
 };
@@ -189,8 +189,8 @@ export {
   user,
   list,
   session,
-  item,
+  // item,
   userList,
   productItem,
-  tempUserList,
+  shareRequests,
 };

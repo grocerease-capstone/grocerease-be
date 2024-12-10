@@ -13,7 +13,7 @@ let response;
 const registerHandler = async (req, res) => {
   const reqBody = req.body;
   const reqFiles = req.files;
-  const imagePrefix = 'profile_image/';
+  const imagePrefix = 'profile_images/';
   let profileImageName;
 
   const reqError = registerValidator(reqBody);
@@ -29,8 +29,13 @@ const registerHandler = async (req, res) => {
   }
 
   profileImageName = `${imagePrefix}default_image.jpg`;
+  profileImageName = `${imagePrefix}default_image.jpg`;
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
+    profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+    await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
+
+    // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
     profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
     await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
 
@@ -46,6 +51,7 @@ const registerHandler = async (req, res) => {
       username: reqBody.username,
       email: reqBody.email,
       password,
+      image: profileImageName,
       image: profileImageName,
     }, { transaction: t });
   };

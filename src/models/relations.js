@@ -4,7 +4,7 @@ import {
   Session,
   UserList,
   ProductItem,
-  TempUserList
+  ShareRequests,
 } from './definitions.js';
 
 User.hasMany(List, { onDelete: 'CASCADE', hooks: true });
@@ -25,11 +25,31 @@ ProductItem.belongsTo(List, {
   onUpdate: 'CASCADE',
 });
 
-User.belongsToMany(List, { through: UserList });
-List.belongsToMany(User, { through: UserList });
+User.belongsToMany(List, { 
+  through: UserList, 
+  foreignKey: 'InvitedId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
 
-User.belongsToMany(List, { through: TempUserList });
-List.belongsToMany(User, { through: TempUserList });
+List.belongsToMany(User, { 
+  through: UserList, 
+  foreignKey: 'ListId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
+
+User.belongsToMany(List, { 
+  through: ShareRequests, 
+  foreignKey: 'InvitedId', 
+  onDelete: 'CASCADE', 
+  hooks: true  });
+List.belongsToMany(User, { 
+  through: ShareRequests,
+  foreignKey: 'ListId', 
+  onDelete: 'CASCADE', 
+  hooks: true 
+});
 
 export {
   User,
@@ -37,7 +57,7 @@ export {
   Session,
   UserList,
   ProductItem,
-  TempUserList
+  ShareRequests
 };
 
 /*

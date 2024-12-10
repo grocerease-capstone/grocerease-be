@@ -4,7 +4,7 @@
   Session,
   UserList,
   ProductItem,
-  TempUserList,
+  ShareRequests,
 } from './relations.js';
 import initDatabaseMigration from './migrate.js';
 
@@ -15,5 +15,5 @@ export {
   Session,
   UserList,
   ProductItem,
-  TempUserList,
+  ShareRequests,
 };

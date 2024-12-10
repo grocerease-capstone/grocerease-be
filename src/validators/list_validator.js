@@ -25,12 +25,10 @@ const listValidator = (body) => {
       .required(),
     receipt_image: Joi.string()
       .allow(null)
-      .empty('')
-      .optional(),
+      .empty(''),
     thumbnail_image: Joi.string()
       .allow(null)
-      .empty('')
-      .optional(),
+      .empty(''),
     total_expenses: Joi.number()
       .empty(''),
     total_items: Joi.number()

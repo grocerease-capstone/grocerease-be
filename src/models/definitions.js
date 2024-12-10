@@ -2,11 +2,11 @@ import { sequelize } from '../config/index.js';
 import {
   user,
   list,
+  // item,
   session,
-  item,
   userList,
   productItem,
-  tempUserList,
+  shareRequests,
 } from './instances.js';
 
 const User = sequelize.define(
@@ -27,11 +27,11 @@ const Session = sequelize.define(
   session.options,
 );
 
-const Item = sequelize.define(
-  item.name,
-  item.attributes,
-  item.options,
-);
+// const Item = sequelize.define(
+//   item.name,
+//   item.attributes,
+//   item.options,
+// );
 
 const UserList = sequelize.define(
   userList.name,
@@ -45,20 +45,20 @@ const ProductItem = sequelize.define(
   productItem.options,
 );
 
-const TempUserList = sequelize.define(
-  tempUserList.name,
-  tempUserList.attributes,
-  tempUserList.options,
+const ShareRequests = sequelize.define(
+  shareRequests.name,
+  shareRequests.attributes,
+  shareRequests.options,
 );
 
 export {
   User,
   List,
   Session,
-  Item,
+  // Item,
   UserList,
   ProductItem,
-  TempUserList,
+  ShareRequests,
   sequelize,
 };
 

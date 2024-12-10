@@ -8,6 +8,16 @@ import {
   updateUserHandler,
   deleteUserHandler,
 } from './user_controller.js';
+import { 
+  createListHandler, 
+  deleteListHandler, 
+  getAllListHandler, 
+  getListById,
+  updateListHandler,
+  getAllListByDateHandler,
+  acceptListHandler,
+  shareListHandler,
+} from '../controllers/list_controller.js';
 
 export {
   registerHandler, 
@@ -16,4 +26,12 @@ export {
   getUserByIdHandler,
   updateUserHandler,
   deleteUserHandler,
+  createListHandler, 
+  deleteListHandler, 
+  getAllListHandler, 
+  getListById,
+  updateListHandler,
+  getAllListByDateHandler,
+  acceptListHandler,
+  shareListHandler,
 };
