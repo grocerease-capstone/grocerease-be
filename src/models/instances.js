@@ -1,7 +1,7 @@
-﻿import { DataTypes } from 'sequelize';
+﻿import { DataTypes } from "sequelize";
 
 const user = {
-  name: 'User',
+  name: "User",
   attributes: {
     id: {
       type: DataTypes.UUID,
@@ -26,13 +26,13 @@ const user = {
     },
   },
   options: {
-    tableName: 'USER',
+    tableName: "USER",
     timestamps: true,
-  }
+  },
 };
 
 const session = {
-  name: 'Session',
+  name: "Session",
   attributes: {
     id: {
       type: DataTypes.UUID,
@@ -45,13 +45,13 @@ const session = {
     },
   },
   options: {
-    tableName: 'SESSION',
+    tableName: "SESSION",
     timestamps: true,
-  }
+  },
 };
 
 const list = {
-  name: 'List',
+  name: "List",
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -74,11 +74,11 @@ const list = {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    totalExpenses : {
+    totalExpenses: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    totalItems : {
+    totalItems: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -88,13 +88,13 @@ const list = {
     },
   },
   options: {
-    tableName: 'LIST',
+    tableName: "LIST",
     timestamps: true,
-  }
+  },
 };
 
 const productItem = {
-  name: 'Product_Item',
+  name: "Product_Item",
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -123,9 +123,9 @@ const productItem = {
     },
   },
   options: {
-    tableName: 'product_item',
+    tableName: "product_item",
     timestamps: false,
-  }
+  },
 };
 
 // const item = {
@@ -156,7 +156,7 @@ const productItem = {
 // };
 
 const userList = {
-  name: 'user_list',
+  name: "user_list",
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -165,32 +165,40 @@ const userList = {
     },
   },
   options: {
-    tableName: 'user_list',
+    tableName: "user_list",
     timestamps: false,
-  }
+  },
 };
 
 const shareRequests = {
-  name: 'share_requests',
+  name: "share_requests",
   attributes: {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
+    invitedId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    listId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   options: {
-    tableName: 'share_requests',
+    tableName: "share_requests",
     timestamps: false,
   },
 };
 
 export {
-  user,
   list,
+  productItem,
   session,
+  shareRequests,
+  user,
   // item,
   userList,
-  productItem,
-  shareRequests,
 };

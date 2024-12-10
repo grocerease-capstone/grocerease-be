@@ -1,8 +1,7 @@
 ﻿// import express from 'express';
-import 'dotenv/config';
-import { app, startServer } from './config/index.js';
-import appRoutes from './routes/index.js';
-import { initDatabaseMigration } from './models/index.js';
+import "dotenv/config";
+import { app, startServer } from "./config/index.js";
+import appRoutes from "./routes/index.js";
 
 // await initDatabaseMigration(); // Run database migrations
 
