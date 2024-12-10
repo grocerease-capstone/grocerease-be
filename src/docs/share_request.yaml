@@ -1,0 +1,41 @@
+components:
+  schemas:
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: boolean
+        code:
+          type: number
+        message:
+          type: string
+        data:
+          type: object
+
+paths:
+  /share-request:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Share Request
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    title:
+                      type: string
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"

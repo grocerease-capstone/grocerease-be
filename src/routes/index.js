@@ -28,33 +28,29 @@ const appRoutes = (app) => {
   app.use("/share-request", shareRequestRoutes);
 
   // swagger
-  app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(
-      swaggerJSDoc({
-        definition: {
-          openapi: "3.1.0",
-          info: {
-            title: "GrocerEase API Documentation",
-            version: "1.0",
-            description:
-              "This is the API documentation for the GrocerEase application.",
-          },
-          components: {
-            securitySchemes: {
-              BearerAuth: {
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT",
-              },
-            },
+  const specs = swaggerJSDoc({
+    definition: {
+      openapi: "3.1.0",
+      info: {
+        title: "GrocerEase API Documentation",
+        version: "1.0",
+        description:
+          "This is the API documentation for the GrocerEase application.",
+      },
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
           },
         },
-        apis: ["./src/routes/*.js"],
-      })
-    )
-  );
+      },
+    },
+    apis: ["./src/docs/*.{js,yaml}"],
+  });
+  console.log(JSON.stringify(specs, null, 2));
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
   return app;
 };

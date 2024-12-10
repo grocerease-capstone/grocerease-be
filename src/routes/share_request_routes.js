@@ -26,8 +26,8 @@ shareRequestRoutes.get("/test", (req, res) => {
   res.send("Share request routes are connected.");
 });
 
-// untuk mendapatkan daftar request yang harus di accept
 shareRequestRoutes.get("/", verifyToken, getAllShareRequestHandler);
+
 // untuk accept request yang di share oleh user lain
 shareRequestRoutes.get(
   "/:shareRequestId",
