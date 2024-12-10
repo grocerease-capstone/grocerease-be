@@ -13,8 +13,41 @@ components:
           type: object
 
 paths:
+  /share-list:
+    post:
+      description: 'create share request for list with invited user'
+      security:
+        - BearerAuth: []
+      tags: 
+        - Share Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invited_id:
+                  type: string
+                list_id:
+                  type: number
+        required:
+          - invited_id
+          - list_id
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+
   /share-request:
     get:
+      description: 'get all share request for current user'
       security:
         - BearerAuth: []
       tags:
@@ -39,3 +72,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedError"
+
+  /share-request/{shareRequestId}:
+    get:
+      description: 'accept share request for list by share request id'
+      security:
+        - BearerAuth: []
+      tags: 
+        - Share Request
+      parameters:
+        - name: shareRequestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError" 
