@@ -1,7 +1,7 @@
-﻿import { DataTypes } from "sequelize";
+﻿import { DataTypes } from 'sequelize';
 
 const user = {
-  name: "User",
+  name: 'User',
   attributes: {
     id: {
       type: DataTypes.UUID,
@@ -24,19 +24,19 @@ const user = {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    fcmToken: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    }
+    // fcmToken: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // }
   },
   options: {
-    tableName: "USER",
+    tableName: 'USER',
     timestamps: true,
   },
 };
 
 const session = {
-  name: "Session",
+  name: 'Session',
   attributes: {
     id: {
       type: DataTypes.UUID,
@@ -49,13 +49,13 @@ const session = {
     },
   },
   options: {
-    tableName: "SESSION",
+    tableName: 'SESSION',
     timestamps: true,
   },
 };
 
 const list = {
-  name: "List",
+  name: 'List',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -92,13 +92,13 @@ const list = {
     },
   },
   options: {
-    tableName: "LIST",
+    tableName: 'LIST',
     timestamps: true,
   },
 };
 
 const productItem = {
-  name: "Product_Item",
+  name: 'Product_Item',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -127,7 +127,7 @@ const productItem = {
     },
   },
   options: {
-    tableName: "product_item",
+    tableName: 'product_item',
     timestamps: false,
   },
 };
@@ -160,7 +160,7 @@ const productItem = {
 // };
 
 const userList = {
-  name: "user_list",
+  name: 'user_list',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -169,13 +169,13 @@ const userList = {
     },
   },
   options: {
-    tableName: "user_list",
+    tableName: 'user_list',
     timestamps: false,
   },
 };
 
 const shareRequests = {
-  name: "share_requests",
+  name: 'share_requests',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -184,7 +184,7 @@ const shareRequests = {
     },
   },
   options: {
-    tableName: "share_requests",
+    tableName: 'share_requests',
     timestamps: false,
   },
 };
