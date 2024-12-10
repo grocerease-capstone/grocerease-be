@@ -1,31 +1,28 @@
 ﻿import {
-  acceptListHandler,
   createListHandler,
   deleteListHandler,
   getAllListByDateHandler,
   getAllListHandler,
   getListById,
-  shareListHandler,
   updateListHandler,
-} from "../controllers/list_controller.js";
+} from '../controllers/list_controller.js';
 import {
   acceptShareRequestHandler,
   createShareRequestHandler,
   getAllShareRequestHandler,
-} from "../controllers/share_request_controller.js";
+} from '../controllers/share_request_controller.js';
 import {
   loginHandler,
   logoutHandler,
   registerHandler,
-} from "./auth_controller.js";
+} from './auth_controller.js';
 import {
   deleteUserHandler,
   getUserByIdHandler,
   updateUserHandler,
-} from "./user_controller.js";
+} from './user_controller.js';
 
 export {
-  acceptListHandler,
   acceptShareRequestHandler,
   createListHandler,
   createShareRequestHandler,
@@ -39,7 +36,6 @@ export {
   loginHandler,
   logoutHandler,
   registerHandler,
-  shareListHandler,
   updateListHandler,
   updateUserHandler,
 };
