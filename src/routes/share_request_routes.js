@@ -8,20 +8,6 @@ import { verifyToken } from "../middlewares/jwt.js";
 
 const shareRequestRoutes = express.Router();
 
-/**
- * @swagger
- * /share-request/test:
- *  get:
- *   tags:
- *    - Share Request
- *   summary: Test Share Request routes
- *   responses:
- *    200:
- *     content:
- *      application/json:
- *       schema:
- *        type: string
- */
 shareRequestRoutes.get("/test", (req, res) => {
   res.send("Share request routes are connected.");
 });
