@@ -12,7 +12,7 @@ export default [
       "linebreak-style": ["off"],
       camelcase: ["off"],
       "no-trailing-spaces": ["off"],
-      quotes: ["off"], // Turn off double quote enforcement
+      // quotes: ["off"], // Turn off double quote enforcement
     },
   },
 ];

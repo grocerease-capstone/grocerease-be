@@ -488,102 +488,6 @@ const deleteListHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
-// Share a List Handler
-const shareListHandler = async (req, res) => {
-  const { listId } = req.query;
-  const reqBody = req.body;
-  // const reqUsers = reqBody.users;
-
-  if (listId <= 0) {
-    response = Response.defaultBadRequest(null);
-    return res.status(response.code).json(response);
-  }
-
-  const invitedUser = await User.findOne({
-    where: {
-      email: reqBody.email,
-    },
-    attributes: ['id'],
-  }).catch((e) => {
-    response = Response.defaultInternalError({ e });
-    return res.status(response.code).json(response);
-  });
-
-  if (!invitedUser) {
-    response = Response.defaultNotFound('User not found.');
-    return res.status(response.code).json(response);
-  }
-
-  const createInviteListTransaction = async (t) => {
-    await ShareRequests.create(
-      {
-        userId: invitedUser.id,
-        listId,
-      },
-      { transaction: t }
-    );
-  };
-
-  try {
-    console.log(invitedUser.id, invitedUser.listId, listId);
-    await sequelize.transaction(createInviteListTransaction);
-  } catch (e) {
-    response = Response.defaultInternalError({ e });
-    return res.status(response.code).json(response);
-  }
-
-  response = Response.defaultOK('Users invited successfully.', null);
-  return res.status(response.code).json(response);
-};
-
-// Accept Share Handler
-const acceptListHandler = async (req, res) => {
-  // const { listId } = req.params;
-  // const { decodedToken } = res.locals;
-  // const reqBody = req.body;
-
-  // if (listId <= 0) {
-  //   response = Response.defaultBadRequest(null);
-  //   return res.status(response.code).json(response);
-  // }
-
-  // const acceptListTransaction = async (t) => {
-  //   const list = await List.findOne({
-  //     where: {
-  //       id: listId,
-  //     },
-  //   }, { transaction: t });
-
-  //   await UserList.create({
-  //     listId: listId,
-  //     UserId: reqBody.userId,
-  //   });
-  // };
-
-  // // try {
-
-  // // } catch (e) {
-
-  // // }
-  // const createShareListTransaction = async (t) => {
-  //   // const addedUsers = JSON.parse(reqUsers).map((user) => ({
-  //   //   UserId: user.userId,
-  //   //   ListId: user.listId,
-  //   // }));
-  //   // await UserList.bulkCreate(addedUsers, { transaction: t });
-  // };
-
-  // try {
-  //   await sequelize.transaction(createShareListTransaction);
-  // } catch (e) {
-  //   response = Response.defaultInternalError({ e });
-  //   return res.status(response.code).json(response);
-  // }
-
-  // response = Response.defaultOK('List shared successfully.', null);
-  // return res.status(response.code).json(response);
-};
-
 export {
   createListHandler,
   getAllListHandler,
@@ -591,6 +495,4 @@ export {
   updateListHandler,
   deleteListHandler,
   getAllListByDateHandler,
-  acceptListHandler,
-  shareListHandler,
 };

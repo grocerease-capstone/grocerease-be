@@ -24,6 +24,10 @@ const user = {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    fcmToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   },
   options: {
     tableName: "USER",

@@ -1,35 +1,48 @@
-import { QueryTypes } from "sequelize";
-import sequelize from "../config/orm.js";
-import Response from "../dto/response.js";
-import { ShareRequests, UserList } from "../models/index.js";
-import { createShareRequestValidator } from "../validators/index.js";
+import { sequelize } from '../models/definitions.js';
+import Response from '../dto/response.js';
+import { ShareRequests, User, UserList, List } from '../models/index.js';
+import { createShareRequestValidator } from '../validators/index.js';
 
 let response;
 
 const createShareRequestHandler = async (req, res) => {
-  const { invited_id, list_id } = req.body;
+  const { listId } = req.params;
+  const reqBody = req.body;
 
-  const reqError = createShareRequestValidator({ invited_id, list_id });
+  const reqError = createShareRequestValidator(reqBody);
   if (reqError.length !== 0) {
     response = Response.defaultBadRequest({ errors: reqError });
     return res.status(response.code).json(response);
   }
 
   try {
+    const invitedEmail = await User.findOne({
+      where: {
+        email: reqBody.email,
+      },
+      attributes: ['id'],
+    });
+  
+    if (!invitedEmail) {
+      response = Response.defaultNotFound('Email not found.');
+      return res.status(response.code).json(response);
+    }
+
     await ShareRequests.create({
-      InvitedId: invited_id,
-      ListId: list_id,
+      InvitedId: invitedEmail.id,
+      ListId: listId,
     });
 
     response = Response.defaultCreated(
-      "Share request created successfully.",
+      'Share request created successfully.',
       null
     );
+
     return res.status(response.code).json(response);
   } catch (e) {
-    console.log(e); // error: data too long for column invited id??
+    console.log(e);
     response = Response.defaultInternalError(
-      "Failed to create share request.",
+      'Failed to create share request.', 
       e.message
     );
     return res.status(response.code).json(response);
@@ -39,30 +52,43 @@ const createShareRequestHandler = async (req, res) => {
 const getAllShareRequestHandler = async (req, res) => {
   try {
     const { decodedToken } = res.locals;
-    const authenticatedUserId = decodedToken.id;
 
-    const requests = await sequelize.query(
-      `
-        select 
-          sr.id, 
-          u.username, 
-          l.title
-        from share_requests sr
-        join USER u on u.id = sr.invitedid
-        join LIST l on l.id = sr.listid
-        where sr.invitedid = :invitedId
-      `,
-      {
-        replacements: { invitedId: authenticatedUserId },
-        type: QueryTypes.SELECT,
-      }
+    const requests = await ShareRequests.findAll({
+      where: {
+        InvitedId: decodedToken.id,
+      },
+      attributes: ['id', 'InvitedId', 'ListId'],
+    });
+
+    const requestDetail = await Promise.all(
+      requests.map(async (request) => {
+        const list = await List.findOne({
+          where: {
+            id: request.ListId,
+          },
+          attributes: ['title'],
+          include: [{
+            model: User,
+            attributes: ['username'],
+          }],
+        });
+
+        const listRequestDTO = {};
+        listRequestDTO.id = request.id;
+        listRequestDTO.title = list.title;
+        listRequestDTO.username = list.User.username;
+
+        console.log(request.id);
+
+        return listRequestDTO;
+      })
     );
 
-    response = Response.defaultOK(authenticatedUserId);
-    return res.status(response.code).json(requests);
+    response = Response.defaultOK('Notifications obtained successfully', { requestDetail });
+    return res.status(response.code).json(response);
   } catch (e) {
     response = Response.defaultInternalError(
-      "Failed to fetch share requests.",
+      'Failed to fetch share requests.', 
       e.message
     );
     return res.status(response.code).json(response);
@@ -75,23 +101,19 @@ const acceptShareRequestHandler = async (req, res) => {
     const { decodedToken } = res.locals;
     const authenticatedUserId = decodedToken.id;
 
-    // cari share request berdasarkan id dan invitedId
     const shareRequest = await ShareRequests.findOne({
-      attributes: ["id", "InvitedId", "ListId"],
+      attributes: ['id', 'InvitedId', 'ListId'],
       where: {
         id: shareRequestId,
         InvitedId: authenticatedUserId,
       },
     });
-    console.log({authenticatedUserId, shareRequestId})
 
-    // jika tidak ada, kembalikan response 404
     if (!shareRequest) {
-      response = Response.defaultNotFound("Share request not found.");
+      response = Response.defaultNotFound('Share request not found.');
       return res.status(response.code).json(response);
     }
 
-    // jika ada, lakukan transaksi untuk menghapus share request dan menambahkan ke user list
     await sequelize.transaction(async (t) => {
       await UserList.create({
         InvitedId: shareRequest.InvitedId,
@@ -100,12 +122,12 @@ const acceptShareRequestHandler = async (req, res) => {
       await shareRequest.destroy({ transaction: t });
     });
 
-    response = Response.defaultOK("Share request accepted.");
+    response = Response.defaultOK('Share request accepted.');
     return res.status(response.code).json(response);
   } catch (e) {
-    console.log({e})
+    console.log(e);
     response = Response.defaultInternalError(
-      "Something went wrong while accepting the share request.",
+      'Something went wrong while accepting the share request.',
       e.message
     );
     return res.status(response.code).json(response);
