@@ -31,7 +31,6 @@ const registerHandler = async (req, res) => {
   }
 
   profileImageName = `${imagePrefix}default_image.jpg`;
-  profileImageName = `${imagePrefix}default_image.jpg`;
 
   if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
     profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
@@ -53,7 +52,6 @@ const registerHandler = async (req, res) => {
       username: reqBody.username,
       email: reqBody.email,
       password,
-      image: profileImageName,
       image: profileImageName,
     }, { transaction: t });
   };
