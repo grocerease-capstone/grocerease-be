@@ -31,6 +31,8 @@
     "mysql2": "^3.11.4",
     "sequelize": "^6.37.5",
     "sequelize-cli": "^6.6.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
