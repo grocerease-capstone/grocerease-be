@@ -13,7 +13,7 @@ components:
           type: object
 
 paths:
-  /share-list:
+  /share-request:
     post:
       description: 'create share request for list with invited user'
       security:
@@ -44,8 +44,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedError"
-
-  /share-request:
     get:
       description: 'get all share request for current user'
       security:

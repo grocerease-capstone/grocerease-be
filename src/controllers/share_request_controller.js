@@ -17,8 +17,8 @@ const createShareRequestHandler = async (req, res) => {
 
   try {
     await ShareRequests.create({
-      invitedId: invited_id,
-      listId: list_id,
+      InvitedId: invited_id,
+      ListId: list_id,
     });
 
     response = Response.defaultCreated(
@@ -77,12 +77,13 @@ const acceptShareRequestHandler = async (req, res) => {
 
     // cari share request berdasarkan id dan invitedId
     const shareRequest = await ShareRequests.findOne({
-      attributes: ["invitedId", "listId"],
+      attributes: ["id", "InvitedId", "ListId"],
       where: {
         id: shareRequestId,
-        invitedId: authenticatedUserId,
+        InvitedId: authenticatedUserId,
       },
     });
+    console.log({authenticatedUserId, shareRequestId})
 
     // jika tidak ada, kembalikan response 404
     if (!shareRequest) {
@@ -93,15 +94,16 @@ const acceptShareRequestHandler = async (req, res) => {
     // jika ada, lakukan transaksi untuk menghapus share request dan menambahkan ke user list
     await sequelize.transaction(async (t) => {
       await UserList.create({
-        invitedId: shareRequest.invitedId,
-        listId: shareRequest.listId,
-      });
+        InvitedId: shareRequest.InvitedId,
+        ListId: shareRequest.ListId,
+      }, { transaction: t });
       await shareRequest.destroy({ transaction: t });
     });
 
     response = Response.defaultOK("Share request accepted.");
     return res.status(response.code).json(response);
   } catch (e) {
+    console.log({e})
     response = Response.defaultInternalError(
       "Something went wrong while accepting the share request.",
       e.message

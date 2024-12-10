@@ -163,14 +163,6 @@ const userList = {
       autoIncrement: true,
       primaryKey: true,
     },
-    invitedId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    listId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
   },
   options: {
     tableName: "user_list",
@@ -185,14 +177,6 @@ const shareRequests = {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-    },
-    invitedId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    listId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
     },
   },
   options: {
