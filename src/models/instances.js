@@ -163,6 +163,14 @@ const userList = {
       autoIncrement: true,
       primaryKey: true,
     },
+    invitedId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    listId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   options: {
     tableName: "user_list",
