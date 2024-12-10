@@ -1,10 +1,10 @@
 import express from 'express';
 import { profileUpload } from '../middlewares/index.js';
-import { verifyToken } from '../middlewares/jwt.js';
 import { 
   getUserByIdHandler, 
   updateUserHandler,
   deleteUserHandler,
+  getUserExpenditureHandler,
 } from '../controllers/index.js';
 import { messaging } from '../config/firebase.js';
 
@@ -13,7 +13,6 @@ const userRoutes = express.Router();
 userRoutes.get('/', getUserByIdHandler);
 userRoutes.put('/', profileUpload, updateUserHandler);
 userRoutes.delete('/', deleteUserHandler);
-
 
 userRoutes.get('/testnotif', (req, res) => {
   messaging.send({
