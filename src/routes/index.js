@@ -49,7 +49,6 @@ const appRoutes = (app) => {
     },
     apis: ["./src/docs/*.{js,yaml}"],
   });
-  console.log(JSON.stringify(specs, null, 2));
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
   return app;
