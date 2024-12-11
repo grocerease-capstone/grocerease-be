@@ -2,6 +2,7 @@ import { sequelize } from '../models/definitions.js';
 import Response from '../dto/response.js';
 import { ShareRequests, User, UserList, List } from '../models/index.js';
 import { createShareRequestValidator } from '../validators/index.js';
+import { shareRequests } from '../models/instances.js';
 
 let response;
 
@@ -134,8 +135,29 @@ const acceptShareRequestHandler = async (req, res) => {
   }
 };
 
+const rejectShareRequestHandler = async (req, res) => {
+  const { shareRequestId } = req.params;
+
+  const shareRequest = await ShareRequests.findOne({
+    where: { id: shareRequestId },
+  });
+
+  if (!shareRequest) {
+    response = Response.defaultNotFound('Share request not found.');
+    return res.status(response.code).json(response);
+  }
+
+  await ShareRequests.destroy({
+    where: { id: shareRequestId },
+  });
+
+  response = Response.defaultOK('Request rejected.', null);
+  return res.status(response.code).json(response);
+};
+
 export {
   acceptShareRequestHandler,
   createShareRequestHandler,
   getAllShareRequestHandler,
+  rejectShareRequestHandler
 };

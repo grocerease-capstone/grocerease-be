@@ -3,6 +3,7 @@ import {
   acceptShareRequestHandler,
   createShareRequestHandler,
   getAllShareRequestHandler,
+  rejectShareRequestHandler
 } from '../controllers/index.js';
 import { verifyToken } from '../middlewares/jwt.js';
 
@@ -15,13 +16,11 @@ shareRequestRoutes.get('/test', (req, res) => {
 shareRequestRoutes.get('/', verifyToken, getAllShareRequestHandler);
 
 // untuk accept request yang di share oleh user lain
-shareRequestRoutes.get(
-  '/:shareRequestId',
-  verifyToken,
-  acceptShareRequestHandler
-);
+shareRequestRoutes.get('/:shareRequestId', verifyToken, acceptShareRequestHandler);
+shareRequestRoutes.delete('/:shareRequestId', verifyToken, rejectShareRequestHandler);
 
 // untuk membuat share request baru ke user lain
 shareRequestRoutes.post('/:listId', verifyToken, createShareRequestHandler);
 
 export default shareRequestRoutes;
+

@@ -23,13 +23,6 @@ const getUserByIdHandler = async (req, res) => {
   const endDate = new Date();
   startDate.setDate(endDate.getDate() - 28);
 
-  console.log(startDate, endDate);
-
-  const year = new Date().getFullYear;
-  const month = new Date().getMonth;
-
-  const boughtAtDate = { [Op.between]: [startDate, endDate] };
-
   const trackLists = await List.findAll({
     where: {
       UserId: decodedToken.id,
@@ -68,35 +61,6 @@ const getUserByIdHandler = async (req, res) => {
 
 const getUserExpenditureHandler = async (req, res) => {
   const { decodedToken } = res.locals;
-
-  // if (type === null) {
-  //   response = Response.defaultBadRequest({ message: 'List type is missing.' });
-  //   return res.status(response.code).json(response);
-  // }
-
-  // let startDate, endDate;
-
-  // const year = new Date().getFullYear;
-  // const month = new Date().getMonth;
-
-
-  // if (!month && !year) {
-  //   boughtAtDate = undefined;
-  // } else if (month < 1 || month > 12) {
-  //   response = Response.defaultBadRequest({ message: 'Month filter invalid.' });
-  //   return res.status(response.code).json(response);
-  // } else {
-  //   const currYear = new Date().getFullYear();
-  //   const targetYear = year || currYear;
-
-  //   if (!month) {
-  //     startDate = new Date(targetYear, 0, 1);
-  //     endDate = new Date(targetYear, 11, 31, 23, 59, 59, 999);
-  //   } else {
-  //     startDate = new Date(targetYear, month - 1, 1);
-  //     endDate = new Date(targetYear, month, 0, 23, 59, 59, 999);
-  //   }
-  // }
 
   const startDate = new Date();
   const endDate = new Date();
