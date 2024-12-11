@@ -109,36 +109,41 @@ paths:
             type: number
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 title:
                   type: string
+                receipt_image:  
+                  type: string
+                  format: binary
+                thumbnail_image:  
+                  type: string
+                  format: binary
                 product_items:
                   type: array
                   items:
                     type: object
                     properties:
                       id:
-                        type: integer
+                        type: number
                       name:
                         type: string
                       amount:
-                        type: integer
+                        type: number
                       price:
-                        type: string
+                        type: number
                       total_price:
-                        type: string
+                        type: number
                       category:
                         type: string
                 type:
                   type: string
                 total_expenses:
                   type: number
-                  format: float
                 total_items:
-                  type: integer
+                  type: number
             required:
               - title
               - product_items
