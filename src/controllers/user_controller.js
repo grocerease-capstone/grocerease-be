@@ -51,14 +51,13 @@ const getUserByIdHandler = async (req, res) => {
     // Calculate total expenses and items for the week
     const weekData = {
       week: `Week ${i + 1}`,
-      data: {
-        total_expenses: weeklyLists.reduce((sum, list) => Number(sum) + Number(list.totalExpenses), 0),
-        total_items: weeklyLists.reduce((sum, list) => Number(sum) +Number(list.totalItems), 0),
-      }
+      total_expenses: weeklyLists.reduce((sum, list) => Number(sum) + Number(list.totalExpenses), 0),
+      total_items: weeklyLists.reduce((sum, list) => Number(sum) + Number(list.totalItems), 0)
     };
 
     listsByWeek.push(weekData);
   }
+
 
   response = Response.defaultOK('User obtained successfully.', { userProfile, listsByWeek });
   return res.status(response.code).json(response);
