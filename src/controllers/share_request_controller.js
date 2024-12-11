@@ -2,12 +2,13 @@ import { sequelize } from '../models/definitions.js';
 import Response from '../dto/response.js';
 import { ShareRequests, User, UserList, List } from '../models/index.js';
 import { createShareRequestValidator } from '../validators/index.js';
-import { shareRequests } from '../models/instances.js';
+import message from '../utils/fcm.js';
 
 let response;
 
 const createShareRequestHandler = async (req, res) => {
   try {
+    const { decodedToken } = res.locals;
     const { listId } = req.params;
     const reqBody = req.body;
 
@@ -17,11 +18,21 @@ const createShareRequestHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
+    const sender = await User.findOne({
+      where: { id: decodedToken.id },
+      attributes: ['username'],
+    });
+
+    const list = await List.findOne({
+      where: { id: listId },
+      attributes: ['title'],
+    });
+
     const invitedEmail = await User.findOne({
       where: {
         email: reqBody.email,
       },
-      attributes: ['id'],
+      attributes: ['id', 'fcmToken'],
     });
   
     if (!invitedEmail) {
@@ -33,6 +44,19 @@ const createShareRequestHandler = async (req, res) => {
       InvitedId: invitedEmail.id,
       ListId: listId,
     });
+
+    const senderUsername = sender.username;
+    const listTitle = list.title;
+
+    const messageTitle = 'GrocerEase: List Invitation';
+    const messageBody = `${senderUsername} invited you to a ${listTitle}.`;
+
+    try {
+      // Sends message to the invited User.
+      message(invitedEmail.fcmToken, messageTitle, messageBody);
+    } catch (fcmError) {
+      console.error('FCM Notification Error:', fcmError);
+    }
 
     response = Response.defaultCreated('Share request created successfully.', null);
     return res.status(response.code).json(response);
@@ -71,8 +95,6 @@ const getAllShareRequestHandler = async (req, res) => {
         listRequestDTO.title = list.title;
         listRequestDTO.username = list.User.username;
 
-        console.log(request.id);
-
         return listRequestDTO;
       })
     );
@@ -104,6 +126,16 @@ const acceptShareRequestHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
+    const sender = await User.findOne({
+      where: { id: decodedToken.id },
+      attributes: ['username', 'fcmToken'],
+    });
+
+    const list = await List.findOne({
+      where: { id: shareRequest.ListId },
+      attributes: ['title'],
+    });
+
     await sequelize.transaction(async (t) => {
       await UserList.create({
         InvitedId: shareRequest.InvitedId,
@@ -112,10 +144,22 @@ const acceptShareRequestHandler = async (req, res) => {
       await shareRequest.destroy({ transaction: t });
     });
 
+    const senderUsername = sender.username;
+    const listTitle = list.title;
+
+    const messageTitle = 'GrocerEase: Accept Invitation';
+    const messageBody = `${senderUsername} accepted your invitation to ${listTitle}.`;
+   
+    try {
+      // Sends message to the list owner.
+      message(sender.fcmToken, messageTitle, messageBody);
+    } catch (fcmError) {
+      console.error('FCM Notification Error:', fcmError);
+    }
+
     response = Response.defaultOK('Share request accepted.');
     return res.status(response.code).json(response);
   } catch (e) {
-    console.log(e);
     response = Response.defaultInternalError(
       'Something went wrong while accepting the share request.',
       e.message
@@ -125,6 +169,7 @@ const acceptShareRequestHandler = async (req, res) => {
 };
 
 const rejectShareRequestHandler = async (req, res) => {
+  const { decodedToken } = res.locals;
   const { shareRequestId } = req.params;
 
   const shareRequest = await ShareRequests.findOne({
@@ -134,6 +179,29 @@ const rejectShareRequestHandler = async (req, res) => {
   if (!shareRequest) {
     response = Response.defaultNotFound('Share request not found.');
     return res.status(response.code).json(response);
+  }
+
+  const sender = await User.findOne({
+    where: { id: decodedToken.id },
+    attributes: ['username', 'fcmToken'],
+  });
+
+  const list = await List.findOne({
+    where: { id: shareRequest.ListId },
+    attributes: ['title'],
+  });
+
+  const senderUsername = sender.username;
+  const listTitle = list.title;
+
+  const messageTitle = 'GrocerEase: Reject Invitation';
+  const messageBody = `${senderUsername} rejected your invitation to ${listTitle}.`;
+
+  try {
+    // Sends message to the list owner.
+    message(sender.fcmToken, messageTitle, messageBody);
+  } catch (fcmError) {
+    console.error('FCM Notification Error:', fcmError);
   }
 
   await ShareRequests.destroy({

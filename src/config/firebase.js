@@ -10,4 +10,6 @@ const app = initializeApp({
   projectId: process.env.GC_PROJECT_ID,
 });
 
-export const messaging = getMessaging(app); 
+const messaging = getMessaging(app);
+
+export { messaging };

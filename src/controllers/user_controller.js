@@ -3,6 +3,7 @@ import { User, List, ProductItem } from '../models/index.js';
 import { encrypt, verifyEncryption } from '../utils/bcrypt.js';
 import { convertFileName } from '../utils/file_process.js';
 import { Op } from 'sequelize';
+import moment from 'moment';
 import Response from '../dto/response.js';
 import uploadFileToStorage from '../config/storage.js';
 
@@ -19,87 +20,48 @@ const getUserByIdHandler = async (req, res) => {
     return res.status(response.code).json(response);
   });
 
-  const startDate = new Date();
-  const endDate = new Date();
-  startDate.setDate(endDate.getDate() - 28);
+  const endDate = moment();
+  const startDate = moment().subtract(28, 'days');
 
   const trackLists = await List.findAll({
     where: {
       UserId: decodedToken.id,
       type: 'Track',
-      boughtAt: { [Op.between]: [startDate, endDate] },
+      boughtAt: {
+        [Op.between]: [startDate.toDate(), endDate.toDate()]
+      }
     },
     attributes: ['id', 'totalExpenses', 'totalItems', 'boughtAt'],
-  }).catch((e) => {
-    response = Response.defaultInternalError({ e });
-    return res.status(response.code).json(response);
+    order: [['boughtAt', 'ASC']]
   });
 
-  console.log(typeof trackLists);
+  const listsByWeek = [];
 
-  const lists = await Promise.all(
-    trackLists.map(async (list) => {
-      const { count } = await ProductItem.findAndCountAll({
-        where: {
-          ListId: list.id,
-        },
-      });
+  for (let i = 0; i < 4; i++) {
+    // Calculate week start and end dates
+    const weekStart = moment(endDate).subtract((4 - i) * 7, 'days').startOf('day');
+    const weekEnd = moment(endDate).subtract((3 - i) * 7, 'days').endOf('day');
 
-      const listDTO = {};
-      listDTO.total_expenses = list.totalExpenses || null;
-      listDTO.total_products = count;
-      listDTO.total_items = list.totalItems;
-      listDTO.boughtAt = list.boughtAt;
+    // Filter and aggregate lists for this week
+    const weeklyLists = trackLists.filter((list) => {
+      const boughtAt = moment(list.boughtAt);
+      return boughtAt.isBetween(weekStart, weekEnd, null, '[]');
+    });
 
-      return listDTO;
-    })
-  );
+    // Calculate total expenses and items for the week
+    const weekData = {
+      week: `Week ${i + 1}`,
+      data: {
+        total_expenses: weeklyLists.reduce((sum, list) => Number(sum) + Number(list.totalExpenses), 0),
+        total_items: weeklyLists.reduce((sum, list) => Number(sum) +Number(list.totalItems), 0),
+      }
+    };
 
-  response = Response.defaultOK('User obtained successfully.', { userProfile, lists });
+    listsByWeek.push(weekData);
+  }
+
+  response = Response.defaultOK('User obtained successfully.', { userProfile, listsByWeek });
   return res.status(response.code).json(response);
-};
-
-const getUserExpenditureHandler = async (req, res) => {
-  const { decodedToken } = res.locals;
-
-  const startDate = new Date();
-  const endDate = new Date();
-  startDate.setDate(endDate.getDate() - 28);
-
-  const boughtAtDate = { [Op.between]: [startDate, endDate] };
-
-  const trackLists = await List.findAll({
-    where: {
-      UserId: decodedToken.id,
-      type: 'Track',
-      ...(boughtAtDate && { boughtAt: boughtAtDate }),
-    },
-    attributes: ['totalExpenses', 'totalItems'],
-  });
-
-  const lists = await Promise.all(
-    trackLists.map(async (list) => {
-      const { count } = await ProductItem.findAndCountAll({
-        where: {
-          ListId: list.id,
-        },
-      });
-
-      const listDTO = {};
-      listDTO.total_expenses = list.totalExpenses || null;
-      listDTO.total_products = count;
-      listDTO.total_items = list.totalItems;
-
-      return listDTO;
-    })
-  );
-
-  response = Response.customOK(
-    'Filtered list obtained successfully.',
-    { lists },
-  );
-  return res.status(response.code).json(response);
-
 };
 
 const updateUserHandler = async (req, res) => {

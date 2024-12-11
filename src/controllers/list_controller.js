@@ -381,8 +381,6 @@ const getAllSharedListHandler = async (req, res) => {
     const { type } = req.query;
     const { decodedToken } = res.locals;
 
-    console.log('This is token and shi ', decodedToken, req.query);
-
     if (type === null) {
       response = Response.defaultBadRequest({ message: 'List type is missing.' });
       return res.status(response.code).json(response);
@@ -392,8 +390,6 @@ const getAllSharedListHandler = async (req, res) => {
       where: { InvitedId: decodedToken.id },
       attributes: ['id', 'ListId'],
     });
-
-    console.log('This is sharedLists: ', sharedLists);
 
     if (!sharedLists || sharedLists.length === 0) {
       response = Response.defaultOK('No lists found for this user');
@@ -423,8 +419,6 @@ const getAllSharedListHandler = async (req, res) => {
         return detailLists[0];
       }),
     );
-
-    console.log('This is allSharedLists: ', allSharedLists);
 
     const allDetailList = await Promise.all(
       allSharedLists.map(async (list) => {
@@ -551,7 +545,6 @@ const updateListHandler = async (req, res) => {
       { where: { id: listId }, transaction: tx });
 
       for (const { id, name, amount, price, total_price, category } of reqBody.product_items) {
-        console.log({ id, name, amount });
         await ProductItem.update({
           name,
           amount,

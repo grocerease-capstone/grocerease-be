@@ -103,6 +103,7 @@ const loginHandler = async (req, res) => {
       id: sessionId,
       token: jwt,
       UserId: user.id,
+      fcmToken: user.fcm_token,
     }, { transaction: t });
   };
   await sequelize.transaction(sessionTransaction);
@@ -132,7 +133,7 @@ const logoutHandler = async (req, res) => {
     return res.status(response.code).json(response);
   }
 
-  response = Response.defaultOK({ message: 'Logout successful.' });
+  response = Response.defaultOK('Logout successful.');
   return res.status(response.code).json(response);
 };
 

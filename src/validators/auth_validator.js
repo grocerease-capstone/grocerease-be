@@ -30,7 +30,9 @@ const loginValidator = (body) => {
       .required(),
     password: Joi.string()
       .min(8)
-      .required()
+      .required(),
+    fcm_token: Joi.string()
+      .required(),
   });
 
   const error = userLogin.validate(body, { abortEarly: false });
