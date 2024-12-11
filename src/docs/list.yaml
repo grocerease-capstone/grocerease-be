@@ -1,3 +1,22 @@
+components:
+  schemas:
+    BadRequestError:
+      type: object
+      properties:
+        status: 
+          type: boolean
+        code: 
+          type: number
+        message: 
+          type: string
+        data: 
+          type: object
+          properties: 
+            errors: 
+              type: array
+              items: 
+                type: string
+
 paths:
   /list:
     post:
@@ -55,21 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status: 
-                    type: boolean
-                  code: 
-                    type: number
-                  message: 
-                    type: string
-                  data: 
-                    type: object
-                    properties: 
-                      errors: 
-                        type: array
-                        items: 
-                          type: string
+                $ref: "#/components/schemas/BadRequestError" 
   
   /list/{listID}:
     put:
@@ -84,10 +89,10 @@ paths:
           description: 'ID of the list to update'
           required: true
           schema:
-            type: string
+            type: number
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -144,25 +149,10 @@ paths:
                         type: string
                         description: 'ID of the updated list'
         400:
-          description: 'Bad Request, invalid data'
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: boolean
-                  code:
-                    type: number
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      errors:
-                        type: array
-                        items:
-                          type: string
+                $ref: "#/components/schemas/BadRequestError" 
         404:
           description: 'List not found, invalid ID'
           content:
