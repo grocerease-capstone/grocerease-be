@@ -22,7 +22,6 @@ import {
   deleteUserHandler,
   getUserByIdHandler,
   updateUserHandler,
-  getUserExpenditureHandler
 } from './user_controller.js';
 
 export {
@@ -43,5 +42,4 @@ export {
   registerHandler,
   updateListHandler,
   updateUserHandler,
-  getUserExpenditureHandler
 };

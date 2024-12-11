@@ -4,7 +4,6 @@ import {
   getUserByIdHandler, 
   updateUserHandler,
   deleteUserHandler,
-  getUserExpenditureHandler,
 } from '../controllers/index.js';
 
 const userRoutes = express.Router();
