@@ -5,50 +5,53 @@ import {
   ShareRequests,
   User,
   UserList,
-} from "./definitions.js";
+} from './definitions.js';
 
-User.hasMany(List, { onDelete: "CASCADE", hooks: true });
+User.hasMany(List, { onDelete: 'CASCADE', hooks: true });
 List.belongsTo(User, {
-  foreignKey: "UserId",
-  onUpdate: "CASCADE",
+  foreignKey: 'UserId',
+  onUpdate: 'CASCADE',
 });
 
 Session.belongsTo(User, {
-  foreignKey: "UserId",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
+  foreignKey: 'UserId',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
 });
 
-List.hasMany(ProductItem, { onDelete: "CASCADE", hooks: true });
+List.hasMany(ProductItem, { onDelete: 'CASCADE', hooks: true });
 ProductItem.belongsTo(List, {
-  foreignKey: "ListId",
-  onUpdate: "CASCADE",
+  foreignKey: 'ListId',
+  onUpdate: 'CASCADE',
 });
 
+// User.hasMany(UserList, { onDelete: 'CASCADE', hooks: true });
 User.belongsToMany(List, {
   through: UserList,
-  foreignKey: "InvitedId",
-  onDelete: "CASCADE",
+  foreignKey: 'InvitedId',
+  onDelete: 'CASCADE',
   hooks: true,
 });
 
+List.hasMany(UserList, { onDelete: 'CASCADE', hooks: true });
 List.belongsToMany(User, {
   through: UserList,
-  foreignKey: "ListId",
-  onDelete: "CASCADE",
+  foreignKey: 'ListId',
+  onDelete: 'CASCADE',
   hooks: true,
 });
 
 User.belongsToMany(List, {
   through: ShareRequests,
-  foreignKey: "InvitedId",
-  onDelete: "CASCADE",
+  foreignKey: 'InvitedId',
+  onDelete: 'CASCADE',
   hooks: true,
 });
+
 List.belongsToMany(User, {
   through: ShareRequests,
-  foreignKey: "ListId",
-  onDelete: "CASCADE",
+  foreignKey: 'ListId',
+  onDelete: 'CASCADE',
   hooks: true,
 });
 

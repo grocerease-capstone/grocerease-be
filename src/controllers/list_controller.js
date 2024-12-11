@@ -378,7 +378,7 @@ const getAllListByDateHandler = async (req, res) => {
 
 const getAllSharedListHandler = async (req, res) => {
   try {
-    const { type, page = 1, limit = 10 } = req.query;
+    const { type } = req.query;
     const { decodedToken } = res.locals;
 
     console.log('This is token and shi ', decodedToken, req.query);
@@ -388,24 +388,17 @@ const getAllSharedListHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
-    const offset = (page - 1) * limit;
-    const parsedLimit = parseInt(limit, 10);
-
     const sharedLists = await UserList.findAll({
       where: { InvitedId: decodedToken.id },
       attributes: ['id', 'ListId'],
     });
 
+    console.log('This is sharedLists: ', JSON.stringify(sharedLists));
+
     if (!sharedLists || sharedLists.length === 0) {
       response = Response.defaultOK('No lists found for this user');
       return res.status(response.code).json(response);
     }
-
-    const listCount = await UserList.findAndCountAll({
-      where: {
-        InvitedId: decodedToken.id,
-      },
-    });
 
     const allSharedLists = await Promise.all(
       sharedLists.map(async (sharedList) => {
@@ -423,8 +416,6 @@ const getAllSharedListHandler = async (req, res) => {
             'totalItems',
             'boughtAt',
           ],
-          limit: parsedLimit,
-          offset,
           order: [['boughtAt', 'DESC']],
         });
 
@@ -463,17 +454,9 @@ const getAllSharedListHandler = async (req, res) => {
       })
     );
 
-    console.log('This is the: ',  { allDetailList });
-
     response = Response.customOK(
       'List obtained successfully.',
       { allDetailList },
-      {
-        total: listCount.count,
-        page: parseInt(page, 10),
-        limit: parsedLimit,
-        totalPages: Math.ceil(listCount.count / parsedLimit),
-      }
     );
     return res.status(response.code).json(response);
   } catch (e) {
