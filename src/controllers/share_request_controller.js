@@ -7,16 +7,16 @@ import { shareRequests } from '../models/instances.js';
 let response;
 
 const createShareRequestHandler = async (req, res) => {
-  const { listId } = req.params;
-  const reqBody = req.body;
-
-  const reqError = createShareRequestValidator(reqBody);
-  if (reqError.length !== 0) {
-    response = Response.defaultBadRequest({ errors: reqError });
-    return res.status(response.code).json(response);
-  }
-
   try {
+    const { listId } = req.params;
+    const reqBody = req.body;
+
+    const reqError = createShareRequestValidator(reqBody);
+    if (reqError.length !== 0) {
+      response = Response.defaultBadRequest({ errors: reqError });
+      return res.status(response.code).json(response);
+    }
+
     const invitedEmail = await User.findOne({
       where: {
         email: reqBody.email,
@@ -34,18 +34,10 @@ const createShareRequestHandler = async (req, res) => {
       ListId: listId,
     });
 
-    response = Response.defaultCreated(
-      'Share request created successfully.',
-      null
-    );
-
+    response = Response.defaultCreated('Share request created successfully.', null);
     return res.status(response.code).json(response);
   } catch (e) {
-    console.log(e);
-    response = Response.defaultInternalError(
-      'Failed to create share request.', 
-      e.message
-    );
+    response = Response.defaultInternalError('Failed to create share request.', { e });
     return res.status(response.code).json(response);
   }
 };
@@ -88,10 +80,7 @@ const getAllShareRequestHandler = async (req, res) => {
     response = Response.defaultOK('Notifications obtained successfully', { requestDetail });
     return res.status(response.code).json(response);
   } catch (e) {
-    response = Response.defaultInternalError(
-      'Failed to fetch share requests.', 
-      e.message
-    );
+    response = Response.defaultInternalError('Failed to fetch share requests.', { e });
     return res.status(response.code).json(response);
   }
 };

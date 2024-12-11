@@ -4,6 +4,7 @@ import {
   deleteListHandler,
   getAllListByDateHandler,
   getAllListHandler,
+  getAllSharedListHandler,
   getListById,
   updateListHandler,
 } from '../controllers/index.js';
@@ -18,8 +19,9 @@ listRoutes.get('/test', (req, res) => {
 
 listRoutes.get('/', verifyToken, getAllListHandler);
 listRoutes.get('/filter', verifyToken, getAllListByDateHandler);
+listRoutes.get('/shared', verifyToken, getAllSharedListHandler);
 listRoutes.get('/:listId', verifyToken, getListById);
-
+  
 listRoutes.post('/', verifyToken, imageUploads, createListHandler);
 
 listRoutes.put('/:listId', verifyToken, imageUploads, updateListHandler);

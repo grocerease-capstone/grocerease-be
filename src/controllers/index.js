@@ -3,6 +3,7 @@
   deleteListHandler,
   getAllListByDateHandler,
   getAllListHandler,
+  getAllSharedListHandler,
   getListById,
   updateListHandler,
 } from '../controllers/list_controller.js';
@@ -33,6 +34,7 @@ export {
   deleteUserHandler,
   getAllListByDateHandler,
   getAllListHandler,
+  getAllSharedListHandler,
   getAllShareRequestHandler,
   getListById,
   getUserByIdHandler,
@@ -42,5 +44,4 @@ export {
   updateListHandler,
   updateUserHandler,
   getUserExpenditureHandler
-  
 };

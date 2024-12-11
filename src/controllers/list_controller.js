@@ -33,7 +33,7 @@ const createListHandler = async (req, res) => {
     response = Response.defaultBadRequest({ errors: reqError });
     return res.status(response.code).json(response);
   }
-  
+
   if (reqFiles.receipt_image && typeof reqFiles.receipt_image === 'object') {
     receiptImageName = convertFileName('receipt_images/', reqFiles.receipt_image[0].originalname);
   }
@@ -376,6 +376,149 @@ const getAllListByDateHandler = async (req, res) => {
   return res.status(response.code).json(response);
 };
 
+const getAllSharedListHandler = async (req, res) => {
+  try {
+    const { type, page = 1, limit = 10 } = req.query;
+    const { decodedToken } = res.locals;
+
+    console.log('This is token and shi ', decodedToken, req.query);
+
+    if (type === null) {
+      response = Response.defaultBadRequest({ message: 'List type is missing.' });
+      return res.status(response.code).json(response);
+    }
+
+    let trackLists, trackCount;
+
+    const offset = (page - 1) * limit;
+    const parsedLimit = parseInt(limit, 10);
+
+    const sharedLists = await UserList.findAll({
+      where: { InvitedId: decodedToken.id },
+      attributes: ['id', 'ListId'],
+    });
+
+    if (!sharedLists || sharedLists.length === 0) {
+      response = Response.defaultOK('No lists found for this user');
+      return res.status(response.code).json(response);
+    }
+
+    const listCount = await UserList.findAndCountAll({
+      where: {
+        InvitedId: decodedToken.id,
+      },
+    });
+
+    console.log(JSON.stringify(sharedLists));
+
+    const allSharedLists = await Promise.all(
+      sharedLists.map(async (sharedList) => {
+        const detailLists = await List.findAll({
+          where: {
+            id: sharedList.ListId,
+          },
+          attributes: [
+            'id',
+            'title',
+            'receiptImage',
+            'thumbnailImage',
+            'type',
+            'totalExpenses',
+            'totalItems',
+            'boughtAt',
+          ],
+          limit: parsedLimit,
+          offset,
+          order: [['boughtAt', 'DESC']],
+        });
+
+        console.log('This is detailLists: ', { detailLists });
+
+        const allDetailList = await Promise.all(
+          detailLists.map(async (list) => {
+            const { count } = await ProductItem.findAndCountAll({
+              where: {
+                ListId: list.id,
+              },
+            });
+
+            const listDTO = {};
+            listDTO.id = list.id;
+            listDTO.title = list.title;
+            listDTO.type = list.type;
+            listDTO.total_expenses = list.totalExpenses || null;
+            listDTO.total_products = count;
+            listDTO.total_items = list.totalItems;
+            listDTO.boughtAt = list.boughtAt;
+
+            if (!list.thumbnailImage && !list.receiptImage) {
+              listDTO.image = `${imagePrefix}default_images/default_image.png`;
+            } else {
+              listDTO.image = list.thumbnailImage
+                ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+                : `${imagePrefix}receipt_images/${list.receiptImage}`;
+            }
+
+            // console.log('This is listDTO: ', {listDTO})
+
+            return listDTO;
+          })
+        );
+
+        // const allDetailList = detailLists.map(async (list) => {
+        //   const { count } = await ProductItem.findAndCountAll({
+        //     where: {
+        //       ListId: list.id,
+        //     },
+        //   });
+
+        //   const listDTO = {};
+        //   listDTO.id = list.id;
+        //   listDTO.title = list.title;
+        //   listDTO.type = list.type;
+        //   listDTO.total_expenses = list.totalExpenses || null;
+        //   listDTO.total_products = count;
+        //   listDTO.total_items = list.totalItems;
+        //   listDTO.boughtAt = list.boughtAt;
+
+        //   if (!list.thumbnailImage && !list.receiptImage) {
+        //     listDTO.image = `${imagePrefix}default_images/default_image.png`;
+        //   } else {
+        //     listDTO.image = list.thumbnailImage
+        //       ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+        //       : `${imagePrefix}receipt_images/${list.receiptImage}`;
+        //   }
+
+        //   console.log('This is listDTO: ', { listDTO })
+
+        //   return listDTO;
+        // });
+
+        console.log('This is allDetailList: ', { allDetailList });
+
+        return allDetailList;
+      })
+    );
+
+    console.log(allSharedLists)
+
+    response = Response.customOK(
+      'List obtained successfully.',
+      { allSharedLists },
+      {
+        total: listCount.count,
+        page: parseInt(page, 10),
+        limit: parsedLimit,
+        totalPages: Math.ceil(listCount.count / parsedLimit),
+      }
+    );
+    return res.status(response.code).json(response);
+  } catch (e) {
+    response = Response.defaultInternalError('Failed to fetch share requests.', { e });
+    return res.status(response.code).json(response);
+  }
+};
+
 const getListById = async (req, res) => {
   const { listId } = req.params;
 
@@ -450,7 +593,7 @@ const updateListHandler = async (req, res) => {
         totalItems: reqBody.total_items,
         updatedAt: new Date(),
       },
-      { where: { id: listId }, transaction: tx });
+        { where: { id: listId }, transaction: tx });
 
       for (const { id, name, amount, price, total_price, category } of reqBody.product_items) {
         console.log({ id, name, amount });
@@ -495,4 +638,5 @@ export {
   updateListHandler,
   deleteListHandler,
   getAllListByDateHandler,
+  getAllSharedListHandler
 };
