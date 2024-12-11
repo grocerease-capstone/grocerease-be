@@ -393,7 +393,7 @@ const getAllSharedListHandler = async (req, res) => {
       attributes: ['id', 'ListId'],
     });
 
-    console.log('This is sharedLists: ', JSON.stringify(sharedLists));
+    console.log('This is sharedLists: ', sharedLists);
 
     if (!sharedLists || sharedLists.length === 0) {
       response = Response.defaultOK('No lists found for this user');
@@ -415,6 +415,7 @@ const getAllSharedListHandler = async (req, res) => {
             'totalExpenses',
             'totalItems',
             'boughtAt',
+            'UserId',
           ],
           order: [['boughtAt', 'DESC']],
         });
@@ -433,6 +434,13 @@ const getAllSharedListHandler = async (req, res) => {
           },
         });
 
+        const ownerName = await User.findOne({
+          where: {
+            id: list.UserId,
+          },
+          attributes: ['username'],
+        });
+
         const listDTO = {};
         listDTO.id = list.id;
         listDTO.title = list.title;
@@ -441,6 +449,7 @@ const getAllSharedListHandler = async (req, res) => {
         listDTO.total_products = count;
         listDTO.total_items = list.totalItems;
         listDTO.boughtAt = list.boughtAt;
+        listDTO.sender = ownerName.username;
 
         if (!list.thumbnailImage && !list.receiptImage) {
           listDTO.image = `${imagePrefix}default_images/default_image.png`;
