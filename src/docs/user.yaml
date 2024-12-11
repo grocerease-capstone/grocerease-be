@@ -1,0 +1,197 @@
+components:
+  schemas:
+    BadRequestError:
+      type: object
+      properties:
+        status: 
+          type: boolean
+        code: 
+          type: number
+        message: 
+          type: string
+        data: 
+          type: object
+          properties: 
+            errors: 
+              type: array
+              items: 
+                type: string
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: boolean
+        code:
+          type: number
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            error: 
+              type: string
+paths:
+  /user:
+    get:
+      description: 'Get Current User'
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      responses:
+        200:
+          description: 'List updated successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: object
+                    properties: 
+                      userProfile: 
+                        type: object
+                        properties: 
+                          username: 
+                            type: string
+                          email: 
+                            type: string
+                          image: 
+                            type: string
+                      lists: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            total_expenses: 
+                              type: string
+                            total_products: 
+                              type: number
+                            total_items: 
+                              type: number
+                            boughtAt: 
+                              type: string
+                              format: date-time
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+    put:
+      description: 'Update user profile'
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'New username for the user'
+                password:
+                  type: string
+                  description: 'Current password of the user'
+                new_password:
+                  type: string
+                  description: 'New password for the user, required if changing the password'
+              required:
+                - password
+      responses:
+        200:
+          description: 'User Updated successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code:
+                    type: number
+                  message:
+                    type: string
+                  data:
+                    type: string
+                    format: nullable
+
+    delete:
+      description: 'Delete user profile'
+      security:
+        - BearerAuth: []
+      tags:
+        - User
+      responses:
+        200:
+          description: 'User deleted successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: string
+                    format: nullable
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        404:
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code:
+                    type: number
+                  message:
+                    type: string
+                  data:
+                    type: string
+                    format: nullable

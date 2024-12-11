@@ -105,7 +105,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestError" 
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError" 
     get:
       security:
         - BearerAuth: []
@@ -263,7 +268,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestError" 
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         404:
           description: 'List not found, invalid ID'
           content:
@@ -280,3 +290,129 @@ paths:
                   data:
                     type: string
                     format: nullable
+    get:
+      description: 'Get Detail List'
+      security:
+        - BearerAuth: []
+      tags: 
+        - List
+      parameters:
+        - name: listID
+          in: path
+          description: 'ID of the list to update'
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: 'List updated successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: object
+                    properties: 
+                      detailList: 
+                        type: object
+                        properties: 
+                          title: 
+                            type: string
+                          receiptImage: 
+                            type: string
+                          thumbnailImage: 
+                            type: string
+                          boughtAt: 
+                            type: string
+                            format: date-time
+                          Product_Items: 
+                            type: array
+                            items: 
+                              type: object
+                              properties: 
+                                id: 
+                                  type: number
+                                name: 
+                                  type: string
+                                amount: 
+                                  type: number
+                                price: 
+                                  type: string
+                                totalPrice: 
+                                  type: string
+                                category: 
+                                  type: string
+                      detailItems: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            id: 
+                              type: number
+                            name: 
+                              type: string
+                            amount: 
+                              type: number
+                            price: 
+                              type: string
+                            total_price: 
+                              type: string
+                            category: 
+                              type: string
+                      thumbnail_image: 
+                        type: string
+                      receipt_image: 
+                        type: string
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+    delete:
+      description: 'Delete List'
+      security:
+        - BearerAuth: []
+      tags: 
+        - List
+      parameters:
+        - name: listID
+          in: path
+          description: 'ID of the list to delete'
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: 'List Deleted successfully'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+            status: 
+              type: boolean
+            code: 
+              type: number
+            message: 
+              type: string
+            data: 
+              type: string
+              format: nullable
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        
