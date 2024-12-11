@@ -187,6 +187,113 @@ paths:
               schema:
                 $ref: "#/components/schemas/UnauthorizedError"
 
+  /list/filter:
+    get:
+      description: 'Get List By Filtered'
+      security:
+        - BearerAuth: []
+      tags:
+        - List
+      parameters:
+        - name: type
+          in: query
+          description: 'Type of the list (e.g., Plan, Track)'
+          required: true
+          schema:
+            type: string
+        - name: month
+          in: query
+          description: 'Month for filtering the list'
+          required: false
+          schema:
+            type: number
+        - name: year
+          in: query
+          description: 'Year for filtering the list'
+          required: false
+          schema:
+            type: number
+        - name: page
+          in: query
+          description: 'Page number for pagination'
+          required: true
+          schema:
+            type: number
+        - name: limit
+          in: query
+          description: 'Limit the number of results per page'
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code:
+                    type: number
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      lists:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            title:
+                              type: string
+                            type:
+                              type: string
+                            total_expenses:
+                              type: string
+                            total_products:
+                              type: number
+                            total_items:
+                              type: number
+                            boughtAt:
+                              type: string
+                              format: date-time
+                            image:
+                              type: string
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      page:
+                        type: number
+                      limit:
+                        type: number
+                      totalPages:
+                        type: number
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code:
+                    type: number
+                  message:
+                    type: string
+                  data:
+                    type: string
+                    format: nullable
   /list/{listID}:
     put:
       description: 'Update the entire list'
