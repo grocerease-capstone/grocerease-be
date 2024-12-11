@@ -10,6 +10,7 @@ import {
   acceptShareRequestHandler,
   createShareRequestHandler,
   getAllShareRequestHandler,
+  rejectShareRequestHandler
 } from '../controllers/share_request_controller.js';
 import {
   loginHandler,
@@ -27,6 +28,7 @@ export {
   acceptShareRequestHandler,
   createListHandler,
   createShareRequestHandler,
+  rejectShareRequestHandler,
   deleteListHandler,
   deleteUserHandler,
   getAllListByDateHandler,
