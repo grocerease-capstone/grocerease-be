@@ -16,6 +16,20 @@ components:
               type: array
               items: 
                 type: string
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: boolean
+        code:
+          type: number
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            error: 
+              type: string
 
 paths:
   /list:
@@ -92,7 +106,82 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequestError" 
-  
+    get:
+      security:
+        - BearerAuth: []
+      tags: 
+        - List
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: object
+                    properties: 
+                      lists: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            id: 
+                              type: number
+                            title: 
+                              type: string
+                            type: 
+                              type: string
+                            total_expenses: 
+                              type: string
+                            total_products: 
+                              type: number
+                            total_items: 
+                              type: number
+                            boughtAt: 
+                              type: string
+                              format: date-time
+                            image: 
+                              type: string
+                  pagination: 
+                    type: object
+                    properties: 
+                      total: 
+                        type: number
+                      page: 
+                        type: number
+                      limit: 
+                        type: number
+                      totalPages: 
+                        type: number
+        401:
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+
   /list/{listID}:
     put:
       description: 'Update the entire list'
@@ -191,4 +280,3 @@ paths:
                   data:
                     type: string
                     format: nullable
-
