@@ -388,8 +388,6 @@ const getAllSharedListHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
-    let trackLists, trackCount;
-
     const offset = (page - 1) * limit;
     const parsedLimit = parseInt(limit, 10);
 
@@ -408,8 +406,6 @@ const getAllSharedListHandler = async (req, res) => {
         InvitedId: decodedToken.id,
       },
     });
-
-    console.log(JSON.stringify(sharedLists));
 
     const allSharedLists = await Promise.all(
       sharedLists.map(async (sharedList) => {
@@ -432,79 +428,46 @@ const getAllSharedListHandler = async (req, res) => {
           order: [['boughtAt', 'DESC']],
         });
 
-        console.log('This is detailLists: ', { detailLists });
+        return detailLists[0];
+      }),
+    );
 
-        const allDetailList = await Promise.all(
-          detailLists.map(async (list) => {
-            const { count } = await ProductItem.findAndCountAll({
-              where: {
-                ListId: list.id,
-              },
-            });
+    console.log('This is allSharedLists: ', allSharedLists);
 
-            const listDTO = {};
-            listDTO.id = list.id;
-            listDTO.title = list.title;
-            listDTO.type = list.type;
-            listDTO.total_expenses = list.totalExpenses || null;
-            listDTO.total_products = count;
-            listDTO.total_items = list.totalItems;
-            listDTO.boughtAt = list.boughtAt;
+    const allDetailList = await Promise.all(
+      allSharedLists.map(async (list) => {
+        const { count } = await ProductItem.findAndCountAll({
+          where: {
+            ListId: list.id,
+          },
+        });
 
-            if (!list.thumbnailImage && !list.receiptImage) {
-              listDTO.image = `${imagePrefix}default_images/default_image.png`;
-            } else {
-              listDTO.image = list.thumbnailImage
-                ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-                : `${imagePrefix}receipt_images/${list.receiptImage}`;
-            }
+        const listDTO = {};
+        listDTO.id = list.id;
+        listDTO.title = list.title;
+        listDTO.type = list.type;
+        listDTO.total_expenses = list.totalExpenses || null;
+        listDTO.total_products = count;
+        listDTO.total_items = list.totalItems;
+        listDTO.boughtAt = list.boughtAt;
 
-            // console.log('This is listDTO: ', {listDTO})
+        if (!list.thumbnailImage && !list.receiptImage) {
+          listDTO.image = `${imagePrefix}default_images/default_image.png`;
+        } else {
+          listDTO.image = list.thumbnailImage
+            ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+            : `${imagePrefix}receipt_images/${list.receiptImage}`;
+        }
 
-            return listDTO;
-          })
-        );
-
-        // const allDetailList = detailLists.map(async (list) => {
-        //   const { count } = await ProductItem.findAndCountAll({
-        //     where: {
-        //       ListId: list.id,
-        //     },
-        //   });
-
-        //   const listDTO = {};
-        //   listDTO.id = list.id;
-        //   listDTO.title = list.title;
-        //   listDTO.type = list.type;
-        //   listDTO.total_expenses = list.totalExpenses || null;
-        //   listDTO.total_products = count;
-        //   listDTO.total_items = list.totalItems;
-        //   listDTO.boughtAt = list.boughtAt;
-
-        //   if (!list.thumbnailImage && !list.receiptImage) {
-        //     listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        //   } else {
-        //     listDTO.image = list.thumbnailImage
-        //       ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-        //       : `${imagePrefix}receipt_images/${list.receiptImage}`;
-        //   }
-
-        //   console.log('This is listDTO: ', { listDTO })
-
-        //   return listDTO;
-        // });
-
-        console.log('This is allDetailList: ', { allDetailList });
-
-        return allDetailList;
+        return listDTO;
       })
     );
 
-    console.log(allSharedLists)
+    console.log('This is the: ',  { allDetailList });
 
     response = Response.customOK(
       'List obtained successfully.',
-      { allSharedLists },
+      { allDetailList },
       {
         total: listCount.count,
         page: parseInt(page, 10),
@@ -593,7 +556,7 @@ const updateListHandler = async (req, res) => {
         totalItems: reqBody.total_items,
         updatedAt: new Date(),
       },
-        { where: { id: listId }, transaction: tx });
+      { where: { id: listId }, transaction: tx });
 
       for (const { id, name, amount, price, total_price, category } of reqBody.product_items) {
         console.log({ id, name, amount });
