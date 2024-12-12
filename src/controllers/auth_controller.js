@@ -42,6 +42,8 @@ const registerHandler = async (req, res) => {
   
     const userId = uuidv4();
     const password = await encrypt(reqBody.password);
+
+    console.log(reqBody.fcm_token);
   
     const userTransaction = async (t) => {
       await User.create({
@@ -83,9 +85,6 @@ const loginHandler = async (req, res) => {
       where: {
         email: reqBody.email,
       },
-    }).catch(() => {
-      response = Response.defaultInternalError(null);
-      return res.status(response.code).json(response);
     });
   
     if (!user) {
@@ -107,7 +106,13 @@ const loginHandler = async (req, res) => {
         id: sessionId,
         token: jwt,
         UserId: user.id,
-        fcmToken: user.fcm_token,
+      }, { transaction: t });
+
+      await User.update({
+        where: {
+          id: user.id,
+        },
+        fcmToken: reqBody.fcm_token,
       }, { transaction: t });
     };
     await sequelize.transaction(sessionTransaction);
