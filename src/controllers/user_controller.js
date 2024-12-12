@@ -7,6 +7,8 @@ import Response from '../dto/response.js';
 import { uploadFileToStorage, deleteFromStorage } from '../config/storage.js';
 
 let response;
+// const imagePrefix = '../../image_upload/';
+const imagePrefix = 'https://storage.googleapis.com/';
 
 const getUserByIdHandler = async (req, res) => {
   try {
@@ -15,10 +17,9 @@ const getUserByIdHandler = async (req, res) => {
     const userProfile = await User.findOne({
       where: { id: decodedToken.id },
       attributes: ['username', 'email', 'image'],
-    }).catch((e) => {
-      response = Response.defaultInternalError({ e });
-      return res.status(response.code).json(response);
     });
+
+    userProfile.image = `${imagePrefix}${userProfile.image}`;
   
     const endDate = moment();
     const startDate = moment().subtract(28, 'days');

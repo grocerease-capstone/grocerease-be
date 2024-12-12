@@ -8,13 +8,13 @@ import { uploadFileToStorage } from '../config/index.js';
 import Response from '../dto/response.js';
 
 let response;
+const imagePrefix = '../../image_upload/';
+// const imagePrefix = 'https://storage.googleapis.com/profile_images/';
 
 const registerHandler = async (req, res) => {
   try {
     const reqBody = req.body;
     const reqFiles = req.files;
-  
-    const imagePrefix = 'profile_images/';
     
     let profileImageName;
   
@@ -30,17 +30,26 @@ const registerHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
   
-    profileImageName = `${imagePrefix}default_image.jpg`;
+    const profileImagePrefix = 'profile_images/';
+    const profileImageDefault = 'default_image.jpg';
+    
   
     if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
-      profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
-      await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
+      
+      profileImageName = convertFileName(profileImagePrefix, reqFiles.profile_image[0].originalname);
+      await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
   
       // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
-      profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
-      await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
+      // profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
+      // await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
   
       // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
+    } else {
+      profileImageName = convertFileName(profileImagePrefix, profileImageDefault);
+      await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
+
+      // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
+
     }
   
     const userId = uuidv4();

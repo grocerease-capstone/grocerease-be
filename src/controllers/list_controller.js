@@ -15,6 +15,7 @@ import { uploadFileToStorage, deleteFromStorage } from '../config/index.js';
 
 let response;
 const imagePrefix = '../../image_upload/';
+// const imagePrefix = 'https://storage.googleapis.com/';
 const default_receipt = 'default_images/default_noreceipt.jpg';
 
 // POST List (Track or Plan)
@@ -204,14 +205,15 @@ const getAllListHandler = async (req, res) => {
         listDTO.total_products = count;
         listDTO.total_items = list.totalItems;
         listDTO.boughtAt = list.boughtAt;
+        listDTO.image = `${imagePrefix}${list.thumbnailImage}`;
   
-        if (!list.thumbnailImage && !list.receiptImage) {
-          listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        } else {
-          listDTO.image = list.thumbnailImage
-            ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-            : `${imagePrefix}receipt_images/${list.receiptImage}`;
-        }
+        // if (!list.thumbnailImage && !list.receiptImage) {
+        //   listDTO.image = `${imagePrefix}default_images/default_image.png`;
+        // } else {
+          
+        //     ? `${imagePrefix}${list.thumbnailImage}`
+        //     : `${imagePrefix}${list.receiptImage}`;
+        // }
   
         return listDTO;
       })
@@ -353,14 +355,15 @@ const getAllListByDateHandler = async (req, res) => {
         listDTO.total_products = count;
         listDTO.total_items = list.totalItems;
         listDTO.boughtAt = list.boughtAt;
+        listDTO.image = `${imagePrefix}${list.thumbnailImage}`;
   
-        if (!list.thumbnailImage && !list.receiptImage) {
-          listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        } else {
-          listDTO.image = list.thumbnailImage
-            ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-            : `${imagePrefix}receipt_images/${list.receiptImage}`;
-        }
+        // if (!list.thumbnailImage && !list.receiptImage) {
+        //   listDTO.image = `${imagePrefix}default_images/default_image.png`;
+        // } else {
+        //   listDTO.image = list.thumbnailImage
+        //     ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
+        //     : `${imagePrefix}receipt_images/${list.receiptImage}`;
+        // }
   
         return listDTO;
       })
@@ -498,28 +501,30 @@ const getListById = async (req, res) => {
       return res.status(response.code).json(response);
     }
   
-    const receipt_image = !detailList.receiptImage
-      ? `${imagePrefix}default_images/default_image.png`
-      : `${imagePrefix}${detailList.receiptImage}`;
+    // const receipt_image = !detailList.receiptImage
+    //   ? `${imagePrefix}default_images/default_image.png`
+    //   : `${imagePrefix}${detailList.receiptImage}`;
   
-    const thumbnail_image = !detailList.thumbnailImage
-      ? receipt_image
-      : `${imagePrefix}${detailList.thumbnailImage}`;
+    // const thumbnail_image = !detailList.thumbnailImage
+    //   ? receipt_image
+    //   : `${imagePrefix}${detailList.thumbnailImage}`;
+
+    detailList.receiptImage = `${imagePrefix}${detailList.receiptImage}`;
+    detailList.thumbnailImage = `${imagePrefix}${detailList.thumbnailImage}`;
+
+    // console.log(receipt_image, thumbnail_image);
   
-    const detailItems = detailList.Product_Items.map((detail) => ({
-      id: detail.id,
-      name: detail.name,
-      amount: detail.amount,
-      price: detail.price || 0,
-      total_price: detail.totalPrice || 0,
-      category: detail.category || '',
-    }));
+    // const detailItems = detailList.Product_Items.map((detail) => ({
+    //   id: detail.id,
+    //   name: detail.name,
+    //   amount: detail.amount,
+    //   price: detail.price || 0,
+    //   total_price: detail.totalPrice || 0,
+    //   category: detail.category || '',
+    // }));
   
     response = Response.defaultOK('List obtained successfully.', {
       detailList,
-      detailItems,
-      thumbnail_image,
-      receipt_image,
     });
 
     return res.status(response.code).json(response);
@@ -570,8 +575,6 @@ const updateListHandler = async (req, res) => {
     response = Response.defaultInternalError({ e });
     return res.status(response.code).json(response);
   }
-
-
 };
 
 const deleteListHandler = async (req, res) => {
