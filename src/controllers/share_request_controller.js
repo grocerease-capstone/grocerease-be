@@ -126,11 +126,6 @@ const acceptShareRequestHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
-    // const sender = await User.findOne({
-    //   where: { id: decodedToken.id },
-    //   attributes: ['username', 'fcmToken'],
-    // });
-
     const list = await List.findOne({
       where: { id: shareRequest.ListId },
       attributes: ['title', 'UserId'],
@@ -193,11 +188,6 @@ const rejectShareRequestHandler = async (req, res) => {
         attributes: ['username', 'fcmToken'],
       },
     });
-
-    // const sender = await User.findOne({
-    //   where: { id: list.UserId },
-    //   attributes: ['username', 'fcmToken'],
-    // });
 
     const senderUsername = list.User.username;
     const listTitle = list.title;
