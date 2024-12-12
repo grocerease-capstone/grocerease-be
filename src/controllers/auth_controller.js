@@ -98,8 +98,6 @@ const loginHandler = async (req, res) => {
   
     const jwt = createToken({ id: user.id });
     const sessionId = uuidv4();
-
-    console.log({reqBody});
   
     const sessionTransaction = async (t) => {
       await Session.create({
