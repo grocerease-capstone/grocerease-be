@@ -97,16 +97,3 @@ export {
   listValidator,
   updateListValidator,
 };
-
-// name: Joi.string()
-//   .min(1)
-//   .required(),
-// amount: Joi.number()
-//   .integer()
-//   .min(1),
-// price: Joi.number()
-//   .min(0),
-// category: Joi.string()
-//   .min(1),
-// total_price: Joi.number()
-//   .min(0)

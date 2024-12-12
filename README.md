@@ -3,17 +3,22 @@
 Backend service for the GrocerEase Mobile App.
 
 ## Technology
-- **Node.js** (for Production)
-- **Nodemon** (for Development and hot reload)
+- **Node.js** (Production)
+- **Nodemon** (Development and hot reload)
 
-## Tools/Frameworks
-- **Express** (JS Framework for Web Server)
-- **Sequelize** (ORM)
-- **JWT** (Access Token Management)
-- **Joi** (Request Body Validation)
-- **Multer** (File Upload Handling)
-- **Swagger** (API documentation)
-- **ESLint** (Linting: Dicoding - daStyle)
+## Framework
+- **ExpressJS**
+
+## Tools
+- **Sequelize** - ORM
+- **JWT** - Access Token Management
+- **Joi** - Request Body Validation
+- **Multer** - File Upload Handling
+- **Swagger** - API documentation
+- **ESLint** - Linting: Dicoding - daStyle
+- **Cloud SDK** - Google Cloud Product Access
+- **MomentJS** - Date processing
+- **Firebase Cloud Messaging** - Notification system
 
 ## Utilities
 - **bcrypt** (Password hashing)
@@ -105,14 +110,14 @@ grocerease-be/
     ```bash
     npm install
     ```
-3. Setup Env
-    ```
-    DB_HOST=your_host_ip  || 127.0.0.1 (Local Default)
-    DB_PORT=your_db_port  || 3306 (Local Default)
-    DB_USER=your_username || root (Local Default)
-    DB_PASSWORD=your_pass || empty (Local Default)
+3. Setup Env for local deployment
+    ```bash
+    DB_HOST=your_host_ip
+    DB_PORT=your_db_port
+    DB_USER=your_username
+    DB_PASSWORD=your_pass
     DB_NAME=your_db_name
-    PORT=8080 || 3000 (Local default)
+    PORT=8080
     SOCKET_PATH= (Optional)
     CONNECTION_NAME= (Optional)
 
@@ -124,7 +129,7 @@ grocerease-be/
     GC_KEY_FILE=path/to/service_account.json
 
 
-    # Firebase Admin Service Account's detail
+    # Firebase Admin Service Account detail (Obtained from service_account.json)
     FCM_PROJECT_ID=your_project_id
     FCM_CLIENT_EMAIL=your_client_email
     FCM_PRIVATE_KEY=your_private_key (-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n)
@@ -185,7 +190,7 @@ grocerease-be/
     ```
     These directories are used to store images locally.
 
-7. API Documentations in Swagger
+7. Checkout API Documentations in Swagger
 
     Checkout this endpoint to read our API Documentation.
     
