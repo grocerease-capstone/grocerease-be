@@ -32,25 +32,13 @@ const registerHandler = async (req, res) => {
   
     const profileImagePrefix = 'profile_images/';
     const profileImageDefault = 'default_image.jpg';
+    profileImageName = `${profileImagePrefix}${profileImageDefault}`;
     
-  
     if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
-      
       profileImageName = convertFileName(profileImagePrefix, reqFiles.profile_image[0].originalname);
       await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
-  
       // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
-      // profileImageName = convertFileName(imagePrefix, reqFiles.profile_image[0].originalname);
-      // await uploadFileToStorage('../../image_upload', profileImageName, reqFiles.profile_image[0].buffer);
-  
-      // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
-    } else {
-      profileImageName = convertFileName(profileImagePrefix, profileImageDefault);
-      await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
-
-      // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
-
-    }
+    } 
   
     const userId = uuidv4();
     const password = await encrypt(reqBody.password);
@@ -61,7 +49,7 @@ const registerHandler = async (req, res) => {
         username: reqBody.username,
         email: reqBody.email,
         password,
-        image: profileImageName,
+        image: profileImageName === '' ? `${profileImagePrefix}${profileImageDefault}` : profileImageName,
       }, { transaction: t });
     };
 
