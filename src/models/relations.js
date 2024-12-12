@@ -1,10 +1,10 @@
 import {
-  User,
   List,
-  Session,
-  UserList,
   ProductItem,
-  TempUserList
+  Session,
+  ShareRequests,
+  User,
+  UserList,
 } from './definitions.js';
 
 User.hasMany(List, { onDelete: 'CASCADE', hooks: true });
@@ -13,7 +13,7 @@ List.belongsTo(User, {
   onUpdate: 'CASCADE',
 });
 
-Session.belongsTo(User, { 
+Session.belongsTo(User, {
   foreignKey: 'UserId',
   onDelete: 'CASCADE',
   onUpdate: 'CASCADE',
@@ -25,20 +25,36 @@ ProductItem.belongsTo(List, {
   onUpdate: 'CASCADE',
 });
 
-User.belongsToMany(List, { through: UserList });
-List.belongsToMany(User, { through: UserList });
+User.belongsToMany(List, {
+  through: UserList,
+  foreignKey: 'InvitedId',
+  onDelete: 'CASCADE',
+  hooks: true,
+});
 
-User.belongsToMany(List, { through: TempUserList });
-List.belongsToMany(User, { through: TempUserList });
+List.hasMany(UserList, { onDelete: 'CASCADE', hooks: true });
+List.belongsToMany(User, {
+  through: UserList,
+  foreignKey: 'ListId',
+  onDelete: 'CASCADE',
+  hooks: true,
+});
 
-export {
-  User,
-  List,
-  Session,
-  UserList,
-  ProductItem,
-  TempUserList
-};
+User.belongsToMany(List, {
+  through: ShareRequests,
+  foreignKey: 'InvitedId',
+  onDelete: 'CASCADE',
+  hooks: true,
+});
+
+List.belongsToMany(User, {
+  through: ShareRequests,
+  foreignKey: 'ListId',
+  onDelete: 'CASCADE',
+  hooks: true,
+});
+
+export { List, ProductItem, Session, ShareRequests, User, UserList };
 
 /*
 Future Tables

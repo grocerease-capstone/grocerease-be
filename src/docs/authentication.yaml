@@ -1,0 +1,181 @@
+paths:
+  /auth/register:
+    post:
+      description: 'Create user account'
+      tags: 
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                password_repeat:
+                  type: string
+        required:
+          - username
+          - email
+          - password
+          - passwordRepeat
+      responses:
+        201: 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: string
+                    format: nullable
+        400:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: object
+                    properties: 
+                      errors: 
+                        type: array
+                        items: 
+                          type: string
+        409:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: string
+
+  /auth/login:
+    post:
+      description: 'Login user account'
+      tags: 
+        - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                fcm_token:
+                  type: string
+        required:
+          - email
+          - password
+          - fcm_token
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    status: 
+                      type: boolean
+                    code: 
+                      type: number
+                    message: 
+                      type: string
+                    data: 
+                      type: string
+        400:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: object
+                    properties: 
+                      errors: 
+                        type: array
+                        items: 
+                          type: string
+        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: string
+                    format: nullable
+
+  /auth/logout:
+    post:
+      description: 'Logout user account'
+      tags: 
+        - Authentication
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    status: 
+                      type: boolean
+                    code: 
+                      type: number
+                    message: 
+                      type: string
+                    data: 
+                      type: string
+        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  status: 
+                    type: boolean
+                  code: 
+                    type: number
+                  message: 
+                    type: string
+                  data: 
+                    type: string
+                    format: nullable

@@ -1,10 +1,13 @@
 import { app, startServer } from './server.js';
-import uploadFileToDatabase from './storage.js';
+import { uploadFileToStorage, deleteFromStorage } from './storage.js';
 import sequelize from './orm.js';
+import { messaging } from './firebase.js';
 
 export {
   app,
   startServer,
   sequelize,
-  uploadFileToDatabase,
+  messaging,
+  uploadFileToStorage,
+  deleteFromStorage
 };

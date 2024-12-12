@@ -1,6 +1,5 @@
 import express from 'express';
-import { profileUpload } from '../middlewares/index.js';
-import { verifyToken } from '../middlewares/jwt.js';
+import { profileUpload, verifyToken } from '../middlewares/index.js';
 import {
   registerHandler,
   loginHandler,

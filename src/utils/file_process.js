@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 
 const convertFileName = (prefix, originalName) => {
-  console.log('this is originalname ', originalName);
   const oldName = originalName.split('.');
   const newName = `${prefix}${uuidv4()}.${oldName[oldName.length - 1]}`;
   return newName;

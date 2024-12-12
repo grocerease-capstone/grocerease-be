@@ -1,6 +1,7 @@
-﻿import { imageUploads, profileUpload } from '../utils/file_process.js';
+﻿import { imageUploads, profileUpload } from '../utils/index.js';
+import { createToken, verifyToken } from '../utils/index.js';
 
 export {
-  imageUploads,
-  profileUpload,
+  imageUploads, profileUpload,
+  createToken, verifyToken
 };

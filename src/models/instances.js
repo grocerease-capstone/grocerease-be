@@ -24,11 +24,15 @@ const user = {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    fcmToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    }
   },
   options: {
     tableName: 'USER',
     timestamps: true,
-  }
+  },
 };
 
 const session = {
@@ -47,7 +51,7 @@ const session = {
   options: {
     tableName: 'SESSION',
     timestamps: true,
-  }
+  },
 };
 
 const list = {
@@ -74,11 +78,11 @@ const list = {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    totalExpenses : {
+    totalExpenses: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
-    totalItems : {
+    totalItems: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -90,7 +94,7 @@ const list = {
   options: {
     tableName: 'LIST',
     timestamps: true,
-  }
+  },
 };
 
 const productItem = {
@@ -125,34 +129,7 @@ const productItem = {
   options: {
     tableName: 'product_item',
     timestamps: false,
-  }
-};
-
-const item = {
-  name: 'Item',
-  attributes: {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    brand: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: true,
-    },
   },
-  options: {
-    tableName: 'ITEM',
-    timestamps: false,
-  }
 };
 
 const userList = {
@@ -167,11 +144,11 @@ const userList = {
   options: {
     tableName: 'user_list',
     timestamps: false,
-  }
+  },
 };
 
-const tempUserList = {
-  name: 'temp_user_list',
+const shareRequests = {
+  name: 'share_requests',
   attributes: {
     id: {
       type: DataTypes.INTEGER,
@@ -180,17 +157,16 @@ const tempUserList = {
     },
   },
   options: {
-    tableName: 'temp_user_list',
+    tableName: 'share_requests',
     timestamps: false,
   },
 };
 
 export {
-  user,
   list,
-  session,
-  item,
-  userList,
   productItem,
-  tempUserList,
+  session,
+  shareRequests,
+  user,
+  userList,
 };
