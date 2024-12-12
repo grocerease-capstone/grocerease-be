@@ -215,14 +215,6 @@ const getAllListHandler = async (req, res) => {
         listDTO.boughtAt = list.boughtAt;
         listDTO.image = `${imagePrefix}${list.thumbnailImage}`;
   
-        // if (!list.thumbnailImage && !list.receiptImage) {
-        //   listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        // } else {
-          
-        //     ? `${imagePrefix}${list.thumbnailImage}`
-        //     : `${imagePrefix}${list.receiptImage}`;
-        // }
-  
         return listDTO;
       })
     );
@@ -365,14 +357,6 @@ const getAllListByDateHandler = async (req, res) => {
         listDTO.boughtAt = list.boughtAt;
         listDTO.image = `${imagePrefix}${list.thumbnailImage}`;
   
-        // if (!list.thumbnailImage && !list.receiptImage) {
-        //   listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        // } else {
-        //   listDTO.image = list.thumbnailImage
-        //     ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-        //     : `${imagePrefix}receipt_images/${list.receiptImage}`;
-        // }
-  
         return listDTO;
       })
     );
@@ -462,14 +446,7 @@ const getAllSharedListHandler = async (req, res) => {
         listDTO.total_items = list.totalItems;
         listDTO.boughtAt = list.boughtAt;
         listDTO.sender = ownerName.username;
-
-        if (!list.thumbnailImage && !list.receiptImage) {
-          listDTO.image = `${imagePrefix}default_images/default_image.png`;
-        } else {
-          listDTO.image = list.thumbnailImage
-            ? `${imagePrefix}thumbnail_images/${list.thumbnailImage}`
-            : `${imagePrefix}receipt_images/${list.receiptImage}`;
-        }
+        listDTO.image = `${imagePrefix}${list.thumbnailImage}`;
 
         return listDTO;
       })
@@ -508,29 +485,10 @@ const getListById = async (req, res) => {
       response = Response.defaultNotFound('List not found.');
       return res.status(response.code).json(response);
     }
-  
-    // const receipt_image = !detailList.receiptImage
-    //   ? `${imagePrefix}default_images/default_image.png`
-    //   : `${imagePrefix}${detailList.receiptImage}`;
-  
-    // const thumbnail_image = !detailList.thumbnailImage
-    //   ? receipt_image
-    //   : `${imagePrefix}${detailList.thumbnailImage}`;
 
     detailList.receiptImage = `${imagePrefix}${detailList.receiptImage}`;
     detailList.thumbnailImage = `${imagePrefix}${detailList.thumbnailImage}`;
 
-    // console.log(receipt_image, thumbnail_image);
-  
-    // const detailItems = detailList.Product_Items.map((detail) => ({
-    //   id: detail.id,
-    //   name: detail.name,
-    //   amount: detail.amount,
-    //   price: detail.price || 0,
-    //   total_price: detail.totalPrice || 0,
-    //   category: detail.category || '',
-    // }));
-  
     response = Response.defaultOK('List obtained successfully.', {
       detailList,
     });

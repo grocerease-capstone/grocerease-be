@@ -21,17 +21,3 @@ shareRequestRoutes.delete('/:shareRequestId', rejectShareRequestHandler);
 shareRequestRoutes.post('/:listId', createShareRequestHandler);
 
 export default shareRequestRoutes;
-
-// shareRequestRoutes.get('/test-notif', (req, res) => {
-//   messaging.send({
-//     token: '', 
-//     notification: {
-//       title: 'Test notif', 
-//       body: 'This is the body', 
-//     }, 
-//     data: {
-//       bebas: 'This is id'
-//     }
-//   });
-// });
-

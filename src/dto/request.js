@@ -1,3 +1,4 @@
+// Deprecated
 const allLists = () => {
   const data = {
     id: 0,

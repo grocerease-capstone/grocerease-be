@@ -11,7 +11,10 @@
     "start-dev": "nodemon src/app.js"
   },
   "keywords": [
-    "Back-End",
+    "Node.js",
+    "Express",
+    "REST API",
+    "Backend",
     "MySQL",
     "JWT"
   ],
