@@ -108,10 +108,7 @@ const loginHandler = async (req, res) => {
         UserId: user.id,
       }, { transaction: t });
 
-      await User.update({
-        where: {
-          id: user.id,
-        },
+      await user.update({
         fcmToken: reqBody.fcm_token,
       }, { transaction: t });
     };
