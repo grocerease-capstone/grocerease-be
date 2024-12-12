@@ -126,14 +126,13 @@ const acceptShareRequestHandler = async (req, res) => {
       return res.status(response.code).json(response);
     }
 
-    const sender = await User.findOne({
-      where: { id: decodedToken.id },
-      attributes: ['username', 'fcmToken'],
-    });
-
     const list = await List.findOne({
       where: { id: shareRequest.ListId },
-      attributes: ['title'],
+      attributes: ['title', 'UserId'],
+      include: {
+        model: User,
+        attributes: ['username', 'fcmToken'],
+      },
     });
 
     await sequelize.transaction(async (t) => {
@@ -144,7 +143,7 @@ const acceptShareRequestHandler = async (req, res) => {
       await shareRequest.destroy({ transaction: t });
     });
 
-    const senderUsername = sender.username;
+    const senderUsername = list.User.username;
     const listTitle = list.title;
 
     const messageTitle = 'GrocerEase: Accept Invitation';
@@ -152,7 +151,7 @@ const acceptShareRequestHandler = async (req, res) => {
    
     try {
       // Sends message to the list owner.
-      sendNotification(sender.fcmToken, messageTitle, messageBody);
+      sendNotification(list.User.fcmToken, messageTitle, messageBody);
     } catch (fcmError) {
       console.error('FCM Notification Error:', fcmError);
     }
@@ -170,7 +169,6 @@ const acceptShareRequestHandler = async (req, res) => {
 
 const rejectShareRequestHandler = async (req, res) => {
   try {
-    const { decodedToken } = res.locals;
     const { shareRequestId } = req.params;
   
     const shareRequest = await ShareRequests.findOne({
@@ -181,24 +179,23 @@ const rejectShareRequestHandler = async (req, res) => {
       response = Response.defaultNotFound('Share request not found.');
       return res.status(response.code).json(response);
     }
-  
-    const sender = await User.findOne({
-      where: { id: decodedToken.id },
-      attributes: ['username', 'fcmToken'],
-    });
-  
+
     const list = await List.findOne({
       where: { id: shareRequest.ListId },
-      attributes: ['title'],
+      attributes: ['title', 'UserId'],
+      include: {
+        model: User,
+        attributes: ['username', 'fcmToken'],
+      },
     });
-  
-    const senderUsername = sender.username;
+
+    const senderUsername = list.User.username;
     const listTitle = list.title;
   
     const messageTitle = 'GrocerEase: Reject Invitation';
     const messageBody = `${senderUsername} rejected your invitation to ${listTitle}.`;
     
-    sendNotification(sender.fcmToken, messageTitle, messageBody);
+    sendNotification(list.User.fcmToken, messageTitle, messageBody);
   
     await ShareRequests.destroy({
       where: { id: shareRequestId },
