@@ -1,5 +1,21 @@
 components:
   schemas:
+    BadRequestError:
+      type: object
+      properties:
+        status: 
+          type: boolean
+        code: 
+          type: number
+        message: 
+          type: string
+        data: 
+          type: object
+          properties: 
+            errors: 
+              type: array
+              items: 
+                type: string
     UnauthorizedError:
       type: object
       properties:
@@ -14,36 +30,6 @@ components:
 
 paths:
   /share-request:
-    post:
-      description: 'create share request for list with invited user'
-      security:
-        - BearerAuth: []
-      tags: 
-        - Share Request
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                invited_id:
-                  type: string
-                list_id:
-                  type: number
-        required:
-          - invited_id
-          - list_id
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                type: object
-        401:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedError"
     get:
       description: 'get all share request for current user'
       security:
@@ -70,7 +56,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedError"
-
+  /share-request/{listId}:
+    post:
+      description: 'create share request for list with invited user'
+      security:
+        - BearerAuth: []
+      tags: 
+        - Share Request
+      parameters:
+        - name: listId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invited_id:
+                  type: string
+                list_id:
+                  type: number
+        required:
+          - invited_id
+          - list_id
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code: 
+                    type: number
+                  message:
+                    type: string
+        400: 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestError"
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
   /share-request/{shareRequestId}:
     get:
       description: 'accept share request for list by share request id'
@@ -90,8 +124,45 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  status:
+                    type: boolean
+                  code: 
+                    type: number
+                  message:
+                    type: string
         401:
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedError" 
+    delete: 
+      description: 'reject share request for list by share request id'
+      security:
+        - BearerAuth: []
+      tags: 
+        - Share Request
+      parameters:
+        - name: shareRequestId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  code: 
+                    type: number
+                  message:
+                    type: string
+        401:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
