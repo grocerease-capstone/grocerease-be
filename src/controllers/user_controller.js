@@ -8,7 +8,7 @@ import { uploadFileToStorage, deleteFromStorage } from '../config/storage.js';
 
 let response;
 // const imagePrefix = '../../image_upload/';
-const imagePrefix = 'https://storage.googleapis.com/';
+const imagePrefix = `https://storage.googleapis.com/${process.env.GC_STORAGE_BUCKET}/`;
 
 const getUserByIdHandler = async (req, res) => {
   try {
