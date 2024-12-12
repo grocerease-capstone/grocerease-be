@@ -87,7 +87,7 @@ paths:
           - total_items
           - boughtAt
       responses:
-        200:
+        201:
           content:
             application/json:
               schema:
@@ -352,7 +352,7 @@ paths:
               - total_expenses
               - total_items
       responses:
-        200:
+        201:
           description: 'List updated successfully'
           content:
             application/json:

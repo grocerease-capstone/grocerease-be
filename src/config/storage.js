@@ -15,12 +15,14 @@ const storage = new Storage({
 
 // Cloud Bucket
 // const uploadFileToStorage = async (bucketName, fileName, contents) => {
-//   console.log('It uploads.', process.env.GC_KEY_FILE, process.env.GC_STORAGE_BUCKET);
 //   await storage.bucket(bucketName).file(fileName).save(contents);
 // };
 
+const deleteFromStorage = async (bucketName, fileName) => {
+  await storage.bucket(bucketName).file(fileName).delete();
+};
 
-// upload to local '../../image_upload'
+// Upload to local '../../image_upload'
 const uploadFileToStorage = async (localDir, fileName, contents) => {
   try {
     const targetDir = path.resolve(__dirname, localDir);
@@ -38,4 +40,4 @@ const uploadFileToStorage = async (localDir, fileName, contents) => {
   }
 };
 
-export default uploadFileToStorage;
+export { uploadFileToStorage, deleteFromStorage };

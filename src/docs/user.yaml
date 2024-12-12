@@ -107,7 +107,7 @@ paths:
               required:
                 - password
       responses:
-        200:
+        201:
           description: 'User Updated successfully'
           content:
             application/json:

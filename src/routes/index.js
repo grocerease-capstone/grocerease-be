@@ -1,6 +1,6 @@
 ﻿import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { verifyToken } from '../middlewares/jwt.js';
+import { verifyToken } from '../middlewares/index.js';
 import authRoutes from './auth_routes.js';
 import listRoutes from './list_routes.js';
 import shareRequestRoutes from './share_request_routes.js';
@@ -11,10 +11,6 @@ const appRoutes = (app) => {
     res.send('Back-End is up and running!');
   });
 
-  app.post('/test', (req, res) => {
-    res.json({ receivedBody: req.body });
-  });
-
   app.get('/test-auth', verifyToken, (req, res) => {
     res.json({
       message: 'This is a protected route!',
@@ -23,9 +19,9 @@ const appRoutes = (app) => {
   });
 
   app.use('/auth', authRoutes);
-  app.use('/list', listRoutes);
+  app.use('/list', verifyToken, listRoutes);
   app.use('/user', verifyToken, userRoutes);
-  app.use('/share-request', shareRequestRoutes);
+  app.use('/share-request', verifyToken, shareRequestRoutes);
 
   // swagger
   const specs = swaggerJSDoc({

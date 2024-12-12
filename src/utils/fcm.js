@@ -1,6 +1,6 @@
-import { messaging } from '../config/firebase.js';
+import { messaging } from '../config/index.js';
 
-const message = async (token, title, body) => {
+const sendNotification = async (token, title, body) => {
   const payload = {
     token: token,
     notification: {
@@ -12,4 +12,4 @@ const message = async (token, title, body) => {
   await messaging.send(payload);
 };
 
-export default message;
+export default sendNotification;

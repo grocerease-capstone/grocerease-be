@@ -34,7 +34,7 @@ paths:
           - invited_id
           - list_id
       responses:
-        200:
+        201:
           content:
             application/json:
               schema:

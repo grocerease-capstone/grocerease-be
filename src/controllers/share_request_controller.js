@@ -1,8 +1,8 @@
-import { sequelize } from '../models/definitions.js';
+import { sequelize } from '../config/index.js';
 import Response from '../dto/response.js';
 import { ShareRequests, User, UserList, List } from '../models/index.js';
 import { createShareRequestValidator } from '../validators/index.js';
-import message from '../utils/fcm.js';
+import { sendNotification } from '../utils/index.js';
 
 let response;
 
@@ -53,7 +53,7 @@ const createShareRequestHandler = async (req, res) => {
 
     try {
       // Sends message to the invited User.
-      message(invitedEmail.fcmToken, messageTitle, messageBody);
+      sendNotification(invitedEmail.fcmToken, messageTitle, messageBody);
     } catch (fcmError) {
       console.error('FCM Notification Error:', fcmError);
     }
@@ -99,7 +99,7 @@ const getAllShareRequestHandler = async (req, res) => {
       })
     );
 
-    response = Response.defaultOK('Notifications obtained successfully', { requestDetail });
+    response = Response.defaultCreated('Notifications obtained successfully', { requestDetail });
     return res.status(response.code).json(response);
   } catch (e) {
     response = Response.defaultInternalError('Failed to fetch share requests.', { e });
@@ -152,7 +152,7 @@ const acceptShareRequestHandler = async (req, res) => {
    
     try {
       // Sends message to the list owner.
-      message(sender.fcmToken, messageTitle, messageBody);
+      sendNotification(sender.fcmToken, messageTitle, messageBody);
     } catch (fcmError) {
       console.error('FCM Notification Error:', fcmError);
     }
@@ -162,54 +162,54 @@ const acceptShareRequestHandler = async (req, res) => {
   } catch (e) {
     response = Response.defaultInternalError(
       'Something went wrong while accepting the share request.',
-      e.message
+      { e }
     );
     return res.status(response.code).json(response);
   }
 };
 
 const rejectShareRequestHandler = async (req, res) => {
-  const { decodedToken } = res.locals;
-  const { shareRequestId } = req.params;
-
-  const shareRequest = await ShareRequests.findOne({
-    where: { id: shareRequestId },
-  });
-
-  if (!shareRequest) {
-    response = Response.defaultNotFound('Share request not found.');
+  try {
+    const { decodedToken } = res.locals;
+    const { shareRequestId } = req.params;
+  
+    const shareRequest = await ShareRequests.findOne({
+      where: { id: shareRequestId },
+    });
+  
+    if (!shareRequest) {
+      response = Response.defaultNotFound('Share request not found.');
+      return res.status(response.code).json(response);
+    }
+  
+    const sender = await User.findOne({
+      where: { id: decodedToken.id },
+      attributes: ['username', 'fcmToken'],
+    });
+  
+    const list = await List.findOne({
+      where: { id: shareRequest.ListId },
+      attributes: ['title'],
+    });
+  
+    const senderUsername = sender.username;
+    const listTitle = list.title;
+  
+    const messageTitle = 'GrocerEase: Reject Invitation';
+    const messageBody = `${senderUsername} rejected your invitation to ${listTitle}.`;
+    
+    sendNotification(sender.fcmToken, messageTitle, messageBody);
+  
+    await ShareRequests.destroy({
+      where: { id: shareRequestId },
+    });
+  
+    response = Response.defaultOK('Request rejected.', null);
+    return res.status(response.code).json(response);
+  } catch (e) {
+    response = Response.defaultInternalError({ e });
     return res.status(response.code).json(response);
   }
-
-  const sender = await User.findOne({
-    where: { id: decodedToken.id },
-    attributes: ['username', 'fcmToken'],
-  });
-
-  const list = await List.findOne({
-    where: { id: shareRequest.ListId },
-    attributes: ['title'],
-  });
-
-  const senderUsername = sender.username;
-  const listTitle = list.title;
-
-  const messageTitle = 'GrocerEase: Reject Invitation';
-  const messageBody = `${senderUsername} rejected your invitation to ${listTitle}.`;
-
-  try {
-    // Sends message to the list owner.
-    message(sender.fcmToken, messageTitle, messageBody);
-  } catch (fcmError) {
-    console.error('FCM Notification Error:', fcmError);
-  }
-
-  await ShareRequests.destroy({
-    where: { id: shareRequestId },
-  });
-
-  response = Response.defaultOK('Request rejected.', null);
-  return res.status(response.code).json(response);
 };
 
 export {

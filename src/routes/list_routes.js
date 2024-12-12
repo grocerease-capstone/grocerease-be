@@ -9,7 +9,6 @@ import {
   updateListHandler,
 } from '../controllers/index.js';
 import { imageUploads } from '../middlewares/index.js';
-import { verifyToken } from '../middlewares/jwt.js';
 
 const listRoutes = express.Router();
 
@@ -17,15 +16,15 @@ listRoutes.get('/test', (req, res) => {
   res.send('List routes are connected.');
 });
 
-listRoutes.get('/', verifyToken, getAllListHandler);
-listRoutes.get('/filter', verifyToken, getAllListByDateHandler);
-listRoutes.get('/shared', verifyToken, getAllSharedListHandler);
-listRoutes.get('/:listId', verifyToken, getListById);
-  
-listRoutes.post('/', verifyToken, imageUploads, createListHandler);
+listRoutes.get('/', getAllListHandler);
+listRoutes.get('/filter', getAllListByDateHandler);
+listRoutes.get('/shared', getAllSharedListHandler);
+listRoutes.get('/:listId', getListById);
 
-listRoutes.put('/:listId', verifyToken, imageUploads, updateListHandler);
+listRoutes.post('/', imageUploads, createListHandler);
 
-listRoutes.delete('/:listId', verifyToken, deleteListHandler);
+listRoutes.put('/:listId', imageUploads, updateListHandler);
+
+listRoutes.delete('/:listId', deleteListHandler);
 
 export default listRoutes;

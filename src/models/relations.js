@@ -55,13 +55,6 @@ List.belongsToMany(User, {
   hooks: true,
 });
 
-// ShareRequests.belongsTo(User, {
-//   foreignKey: "InvitedId",
-// });
-// ShareRequests.belongsTo(List, {
-//   foreignKey: "ListId",
-// });
-
 export { List, ProductItem, Session, ShareRequests, User, UserList };
 
 /*
