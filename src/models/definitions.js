@@ -2,7 +2,6 @@ import { sequelize } from '../config/index.js';
 import {
   user,
   list,
-  // item,
   session,
   userList,
   productItem,
@@ -27,12 +26,6 @@ const Session = sequelize.define(
   session.options,
 );
 
-// const Item = sequelize.define(
-//   item.name,
-//   item.attributes,
-//   item.options,
-// );
-
 const UserList = sequelize.define(
   userList.name,
   userList.attributes,
@@ -55,7 +48,6 @@ export {
   User,
   List,
   Session,
-  // Item,
   UserList,
   ProductItem,
   ShareRequests,

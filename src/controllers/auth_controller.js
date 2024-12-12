@@ -8,8 +8,8 @@ import { uploadFileToStorage } from '../config/index.js';
 import Response from '../dto/response.js';
 
 let response;
-const imagePrefix = '../../image_upload/';
-// const imagePrefix = 'https://storage.googleapis.com/profile_images/';
+// const imagePrefix = '../../image_upload/';
+const imagePrefix = 'https://storage.googleapis.com/profile_images/';
 
 const registerHandler = async (req, res) => {
   try {
@@ -36,8 +36,8 @@ const registerHandler = async (req, res) => {
     
     if (reqFiles.profile_image && typeof reqFiles.profile_image === 'object') {
       profileImageName = convertFileName(profileImagePrefix, reqFiles.profile_image[0].originalname);
-      await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
-      // await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
+      // await uploadFileToStorage(imagePrefix, profileImageName, reqFiles.profile_image[0].buffer);
+      await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, profileImageName, reqFiles.profile_image[0].buffer);
     } 
   
     const userId = uuidv4();
@@ -49,7 +49,7 @@ const registerHandler = async (req, res) => {
         username: reqBody.username,
         email: reqBody.email,
         password,
-        image: profileImageName === '' ? `${profileImagePrefix}${profileImageDefault}` : profileImageName,
+        image: profileImageName,
       }, { transaction: t });
     };
 
@@ -148,7 +148,6 @@ const logoutHandler = async (req, res) => {
     response = Response.defaultInternalError({ e });
     return res.status(response.code).json(response);
   }
-
 };
 
 export {

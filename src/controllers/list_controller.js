@@ -14,8 +14,8 @@ import Response from '../dto/response.js';
 import { uploadFileToStorage, deleteFromStorage } from '../config/index.js';
 
 let response;
-const imagePrefix = '../../image_upload/';
-// const imagePrefix = 'https://storage.googleapis.com/';
+// const imagePrefix = '../../image_upload/';
+const imagePrefix = 'https://storage.googleapis.com/';
 const default_receipt = 'default_images/default_noreceipt.jpg';
 
 // POST List (Track or Plan)
@@ -78,30 +78,38 @@ const createListHandler = async (req, res) => {
     await sequelize.transaction(createListTransaction);
   
     // Cloud Upload
-    // if (receiptImageName) {
-    //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, receiptImageName, reqFiles.receipt_image[0].buffer);
-    // }
-  
-    // if (thumbnailImageName) {
-    //   await uploadFileToStorage(process.env.GC_STORAGE_BUCKET, thumbnailImageName, reqFiles.thumbnail_image[0].buffer);
-    // }
-  
-    // Local Upload
     if (receiptImageName) {
       await uploadFileToStorage(
-        '../../image_upload',
-        receiptImageName,
+        process.env.GC_STORAGE_BUCKET, 
+        receiptImageName, 
         reqFiles.receipt_image[0].buffer
       );
     }
   
     if (thumbnailImageName) {
       await uploadFileToStorage(
-        '../../image_upload',
-        thumbnailImageName,
+        process.env.GC_STORAGE_BUCKET, 
+        thumbnailImageName, 
         reqFiles.thumbnail_image[0].buffer
       );
     }
+  
+    // Local Upload
+    // if (receiptImageName) {
+    //   await uploadFileToStorage(
+    //     '../../image_upload',
+    //     receiptImageName,
+    //     reqFiles.receipt_image[0].buffer
+    //   );
+    // }
+  
+    // if (thumbnailImageName) {
+    //   await uploadFileToStorage(
+    //     '../../image_upload',
+    //     thumbnailImageName,
+    //     reqFiles.thumbnail_image[0].buffer
+    //   );
+    // }
   
     response = Response.defaultCreated('New list added successfully.', null);
     return res.status(response.code).json(response);

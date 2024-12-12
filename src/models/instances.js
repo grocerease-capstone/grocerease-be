@@ -132,33 +132,6 @@ const productItem = {
   },
 };
 
-// const item = {
-//   name: 'Item',
-//   attributes: {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       primaryKey: true,
-//       autoIncrement: true,
-//     },
-//     name: {
-//       type: DataTypes.STRING,
-//       allowNull: true,
-//     },
-//     brand: {
-//       type: DataTypes.STRING,
-//       allowNull: true,
-//     },
-//     price: {
-//       type: DataTypes.DECIMAL,
-//       allowNull: true,
-//     },
-//   },
-//   options: {
-//     tableName: 'ITEM',
-//     timestamps: false,
-//   }
-// };
-
 const userList = {
   name: 'user_list',
   attributes: {
@@ -195,6 +168,5 @@ export {
   session,
   shareRequests,
   user,
-  // item,
   userList,
 };

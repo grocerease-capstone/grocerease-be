@@ -25,7 +25,6 @@ ProductItem.belongsTo(List, {
   onUpdate: 'CASCADE',
 });
 
-// User.hasMany(UserList, { onDelete: 'CASCADE', hooks: true });
 User.belongsToMany(List, {
   through: UserList,
   foreignKey: 'InvitedId',
