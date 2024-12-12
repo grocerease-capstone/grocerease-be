@@ -83,9 +83,6 @@ const loginHandler = async (req, res) => {
       where: {
         email: reqBody.email,
       },
-    }).catch(() => {
-      response = Response.defaultInternalError(null);
-      return res.status(response.code).json(response);
     });
   
     if (!user) {
@@ -101,13 +98,18 @@ const loginHandler = async (req, res) => {
   
     const jwt = createToken({ id: user.id });
     const sessionId = uuidv4();
+
+    console.log({reqBody});
   
     const sessionTransaction = async (t) => {
       await Session.create({
         id: sessionId,
         token: jwt,
         UserId: user.id,
-        fcmToken: user.fcm_token,
+      }, { transaction: t });
+
+      await user.update({
+        fcmToken: reqBody.fcm_token,
       }, { transaction: t });
     };
     await sequelize.transaction(sessionTransaction);
