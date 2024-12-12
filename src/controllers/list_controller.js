@@ -15,7 +15,7 @@ import { uploadFileToStorage, deleteFromStorage } from '../config/index.js';
 
 let response;
 // const imagePrefix = '../../image_upload/';
-const imagePrefix = 'https://storage.googleapis.com/';
+const imagePrefix = `https://storage.googleapis.com/${process.env.GC_STORAGE_BUCKET}/`;
 const default_receipt = 'default_images/default_noreceipt.jpg';
 
 // POST List (Track or Plan)
