@@ -203,3 +203,12 @@ grocerease-be/
     ```bash
     https://grocerease-be-407517281668.asia-southeast2.run.app/api-docs/
     ```
+    To fully utilize the features of the Backend, you first need to create an account and then login with the registered account. After logging in, you will be given a JWT token. This is the input format:
+    1. Checkout .../api-docs/
+    2. Click the **Authorize** button.
+    3. Input in the value column:
+    ```bash
+    Bearer: <your_jwt_token>
+    ```
+
+    With the space in between. Make sure it is in this format, otherwise it won't be detected.
